@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Elden Ring">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a12">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%230a0a12' width='180' height='180' rx='36'/%3E%3Ccircle cx='90' cy='75' r='40' fill='none' stroke='%23c8a84e' stroke-width='3'/%3E%3Cline x1='90' y1='35' x2='90' y2='115' stroke='%23c8a84e' stroke-width='2'/%3E%3Cline x1='60' y1='55' x2='120' y2='95' stroke='%23c8a84e' stroke-width='2'/%3E%3Cline x1='120' y1='55' x2='60' y2='95' stroke='%23c8a84e' stroke-width='2'/%3E%3Ctext x='90' y='155' text-anchor='middle' fill='%23c8a84e' font-size='18' font-family='serif'%3EELDEN RING%3C/text%3E%3C/svg%3E">
+<title>Elden Ring - Guide Complet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a12;--bg2:#12121e;--bg3:#1a1a2e;--bg4:#22223a;
+    --gold:#c8a84e;--gold-dim:#8a7235;--gold-bright:#e8c84e;
+    --red:#c44040;--red-bg:rgba(196,64,64,0.12);
+    --green:#4caf50;--blue:#5c8dd6;--purple:#9c6dd6;
+    --text:#d4d0c8;--text-dim:#888078;--text-bright:#f0ece4;
+    --border:#2a2a3e;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;padding-top:env(safe-area-inset-top);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+  /* HEADER */
+  .header{background:linear-gradient(180deg,var(--bg2),var(--bg));border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:200;flex-wrap:wrap}
+  .header h1{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);letter-spacing:2px;white-space:nowrap}
+  .header-progress{flex:1;min-width:150px;max-width:280px}
+  .progress-bar{background:var(--bg4);border-radius:10px;height:7px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-bright));border-radius:10px;transition:width .4s}
+  .progress-text{font-size:11px;color:var(--text-dim);margin-top:2px}
+  .nav{display:flex;gap:4px;margin-left:auto}
+  .nav button{background:0;border:1px solid var(--border);color:var(--text-dim);padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+  .nav button:hover{border-color:var(--gold-dim);color:var(--text)}
+  .nav button.active{background:var(--bg3);border-color:var(--gold);color:var(--gold)}
+
+  /* FILTERS */
+  .filters{padding:8px 20px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--bg);align-items:center}
+  .fbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;border-radius:16px;font-size:11px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+  .fbtn:hover{border-color:var(--gold-dim)}
+  .fbtn.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:500}
+  .fbtn.miss.active{background:var(--red);border-color:var(--red);color:#fff}
+  .search-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:16px;font-size:11px;outline:none;width:180px;font-family:'Inter',sans-serif;margin-left:auto}
+  .search-input::placeholder{color:var(--text-dim)}
+  .search-input:focus{border-color:var(--gold-dim)}
+
+  /* MAIN */
+  .main{display:flex;height:calc(100vh - 88px)}
+  .hidden{display:none!important}
+
+  /* WORLD MAP */
+  .map-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .map-tabs{display:flex;gap:5px;padding:12px 20px 0}
+  .mtab{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);padding:4px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+  .mtab:hover{border-color:var(--gold-dim)}
+  .mtab.active{background:var(--bg4);border-color:var(--gold);color:var(--gold)}
+  .map-container{flex:1;overflow:auto;margin:12px 20px 20px;border-radius:10px;border:1px solid var(--border);background:#080810;display:flex;align-items:center;justify-content:center}
+  .map-container svg{width:100%;height:100%;max-height:calc(100vh - 180px)}
+
+  /* SVG */
+  .land{fill:#10101c;stroke:#1a1a2e;stroke-width:1}
+  .conn{stroke:#252540;stroke-width:1.5;stroke-dasharray:6,4;fill:none}
+  .region{cursor:pointer}
+  .region .rbg{rx:8;ry:8;stroke:#2a2a44;stroke-width:1.5;transition:all .15s}
+  .region:hover .rbg{stroke:#8a7235;stroke-width:2;filter:brightness(1.25)}
+  .region.sel .rbg{stroke:var(--gold);stroke-width:2.5;filter:brightness(1.3)}
+  .region.done .rbg{stroke:var(--green);stroke-width:2}
+  .region .rlbl{font-family:'Cinzel',serif;font-size:10.5px;fill:var(--text-bright);text-anchor:middle;pointer-events:none}
+  .region .rpct{font-family:'Inter',sans-serif;font-size:8px;fill:var(--gold);text-anchor:middle;pointer-events:none}
+  .region .rpbar-bg{fill:#0a0a14;rx:2;ry:2}
+  .region .rpbar{fill:var(--gold);rx:2;ry:2;transition:width .3s}
+  .region.done .rpbar{fill:var(--green)}
+  .miss-dot{fill:var(--red)}
+  .erdtree-glow{fill:url(#erdtreeGrad);opacity:.5}
+  .erdtree-trunk{stroke:var(--gold-dim);stroke-width:2;fill:none;opacity:.4}
+  .floating-label{font-family:'Inter',sans-serif;font-size:8px;fill:var(--text-dim);text-anchor:middle;font-style:italic}
+
+  /* AREA DETAIL VIEW (full screen map + side checklist) */
+  .area-view{display:flex;height:calc(100vh - 88px);width:100%}
+  .area-map-section{flex:1;position:relative;overflow:auto;background:#080810;display:flex;align-items:center;justify-content:center;min-width:0}
+  .area-map-img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .area-map-fallback{color:var(--text-dim);text-align:center;padding:40px}
+  .area-map-fallback p{margin-top:8px;font-size:12px}
+  .area-map-fallback .fallback-icon{font-size:48px;opacity:.25;margin-bottom:12px;display:block}
+
+  .back-btn{position:absolute;top:14px;left:14px;background:rgba(10,10,18,.9);border:1px solid var(--border);color:var(--gold);padding:7px 16px;border-radius:8px;cursor:pointer;font-family:'Cinzel',serif;font-size:12px;z-index:10;transition:all .2s;display:flex;align-items:center;gap:6px}
+  .back-btn:hover{border-color:var(--gold);background:rgba(26,26,46,.95)}
+  .back-btn svg{width:14px;height:14px;fill:var(--gold)}
+
+  .area-panel{width:420px;min-width:420px;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+  .area-panel-head{padding:16px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:10}
+  .area-panel-head h2{font-family:'Cinzel',serif;font-size:17px;color:var(--gold);margin-bottom:4px}
+  .area-panel-head p{font-size:11px;color:var(--text-dim);line-height:1.5}
+  .area-panel-stats{display:flex;gap:10px;margin-top:8px;font-size:11px}
+  .dstat{background:var(--bg4);padding:3px 8px;border-radius:10px;color:var(--text-dim)}
+  .dstat span{color:var(--text);font-weight:500}
+  .area-panel-progress{margin-top:10px}
+  .area-pbar{background:var(--bg4);border-radius:6px;height:6px;overflow:hidden}
+  .area-pbar-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-bright));border-radius:6px;transition:width .3s}
+
+  .checklist{padding:10px 18px 20px;flex:1}
+  .cg-title{font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);margin:14px 0 6px;padding-bottom:3px;border-bottom:1px solid var(--border);letter-spacing:1px}
+  .ci{display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border-radius:6px;transition:background .15s;cursor:pointer}
+  .ci:hover{background:var(--bg4)}
+  .ci.done{opacity:.4}
+  .ci.done .ci-name{text-decoration:line-through}
+  .ci-box{width:16px;height:16px;min-width:16px;border:2px solid var(--border);border-radius:3px;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:10px}
+  .ci.done .ci-box{background:var(--green);border-color:var(--green);color:#fff}
+  .ci-info{flex:1;min-width:0}
+  .ci-name{font-size:12px;color:var(--text-bright);font-weight:500;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .ci-desc{font-size:11px;color:var(--text-dim);margin-top:1px;line-height:1.45}
+  .tag{font-size:8px;padding:1px 5px;border-radius:8px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+  .tag-boss{background:rgba(220,90,60,.2);color:#e07050}
+  .tag-npc{background:rgba(92,141,214,.2);color:var(--blue)}
+  .tag-item{background:rgba(200,168,78,.2);color:var(--gold)}
+  .tag-location{background:rgba(156,109,214,.2);color:var(--purple)}
+  .tag-quest{background:rgba(92,141,214,.12);color:var(--blue);border:1px solid rgba(92,141,214,.25)}
+  .tag-missable{background:var(--red-bg);color:var(--red);border:1px solid rgba(196,64,64,.3)}
+  .tag-fin{background:rgba(76,175,80,.15);color:var(--green)}
+
+  /* QUESTS & ENDINGS */
+  .qview{padding:20px;max-width:800px;margin:0 auto;display:none;overflow-y:auto;flex:1}
+  .qview.active{display:block}
+  .qcard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+  .qcard:hover{border-color:var(--gold-dim)}
+  .qhead{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+  .qname{font-family:'Cinzel',serif;font-size:14px;color:var(--text-bright)}
+  .qmeta{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim)}
+  .qarrow{transition:transform .2s;color:var(--text-dim);font-size:11px}
+  .qcard.open .qarrow{transform:rotate(180deg)}
+  .qsteps{display:none;padding:0 16px 12px}
+  .qcard.open .qsteps{display:block}
+  .qs{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--border);align-items:flex-start;cursor:pointer}
+  .qs.done{opacity:.4}
+  .qs.done .qs-text{text-decoration:line-through}
+  .qs-num{width:20px;height:20px;min-width:20px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--text-dim)}
+  .qs.done .qs-num{background:var(--green);border-color:var(--green);color:#fff}
+  .qs-info{flex:1}
+  .qs-text{font-size:12px;color:var(--text);line-height:1.5}
+  .qs-area{font-size:10px;color:var(--text-dim);margin-top:2px}
+  .eview{padding:20px;max-width:800px;margin:0 auto;display:none;overflow-y:auto;flex:1}
+  .eview.active{display:block}
+  .ecard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
+  .ename{font-family:'Cinzel',serif;font-size:15px;color:var(--gold);margin-bottom:5px}
+  .ereq{font-size:12px;color:var(--text);line-height:1.6}
+  .ewarn{background:var(--red-bg);border:1px solid rgba(196,64,64,.25);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:11px;color:var(--red);line-height:1.5}
+
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold-dim)}
+  @media(max-width:900px){
+    .main{flex-direction:column}
+    .area-view{flex-direction:column}
+    .area-panel{width:100%;min-width:unset;max-height:50vh;border-left:0;border-top:1px solid var(--border)}
+    .area-map-section{min-height:35vh}
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>ELDEN RING</h1>
+  <div class="header-progress">
+    <div class="progress-bar"><div class="progress-fill" id="totalProg" style="width:0%"></div></div>
+    <div class="progress-text" id="totalText">0 / 0</div>
+  </div>
+  <div class="nav">
+    <button class="active" onclick="showView('map',this)">Carte</button>
+    <button onclick="showView('quests',this)">Quetes PNJ</button>
+    <button onclick="showView('endings',this)">Fins</button>
+  </div>
+</div>
+<div class="filters" id="filterBar">
+  <button class="fbtn active" data-f="all">Tout</button>
+  <button class="fbtn" data-f="boss">Boss</button>
+  <button class="fbtn" data-f="npc">PNJ</button>
+  <button class="fbtn" data-f="item">Objets</button>
+  <button class="fbtn" data-f="location">Lieux</button>
+  <button class="fbtn miss" data-f="missable">Manquable</button>
+  <input type="text" class="search-input" placeholder="Rechercher..." id="searchIn" oninput="applyFilters()">
+</div>
+<div class="main" id="mainContent">
+  <!-- WORLD MAP VIEW -->
+  <div class="map-wrap" id="mapWrap">
+    <div class="map-tabs">
+      <button class="mtab active" onclick="showMap('overworld',this)">L'Entre-Terre</button>
+      <button class="mtab" onclick="showMap('underground',this)">Souterrains</button>
+      <button class="mtab" onclick="showMap('dlc',this)">Shadow of the Erdtree</button>
+    </div>
+    <div class="map-container" id="mapCont"></div>
+  </div>
+
+  <!-- AREA DETAIL VIEW (replaces world map when area selected) -->
+  <div class="area-view hidden" id="areaView">
+    <div class="area-map-section">
+      <button class="back-btn" onclick="backToMap()">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Carte
+      </button>
+      <div id="areaMapContent"></div>
+    </div>
+    <div class="area-panel">
+      <div class="area-panel-head">
+        <h2 id="apTitle"></h2>
+        <p id="apDesc"></p>
+        <div class="area-panel-stats" id="apStats"></div>
+        <div class="area-panel-progress"><div class="area-pbar"><div class="area-pbar-fill" id="apBar" style="width:0%"></div></div></div>
+      </div>
+      <div class="checklist" id="cklist"></div>
+    </div>
+  </div>
+
+  <!-- QUESTS & ENDINGS -->
+  <div class="qview" id="qView"></div>
+  <div class="eview" id="eView"></div>
+</div>
+
+<script>
+// ============================= MAP LAYOUT =============================
+const mapLayout = {
+  overworld: {
+    viewBox:'0 0 960 740',
+    land:'M 350 720 L 410 700 L 460 720 L 520 700 L 580 660 L 630 600 L 700 560 L 800 480 L 830 400 L 820 320 L 790 240 L 750 170 L 700 110 L 640 70 L 560 40 L 470 30 L 380 35 L 300 60 L 240 100 L 180 170 L 140 250 L 130 340 L 150 420 L 200 480 L 280 530 L 340 580 L 380 640 L 370 700 Z',
+    erdtree:{x:530,y:185},
+    connections:[['limgrave','weeping'],['limgrave','stormveil'],['limgrave','caelid'],['stormveil','liurnia'],['liurnia','academy'],['liurnia','altus'],['altus','gelmir'],['altus','leyndell'],['leyndell','mountaintops'],['mountaintops','snowfield'],['snowfield','haligtree'],['mountaintops','farum']],
+  },
+  underground: {
+    viewBox:'0 0 800 520',land:null,erdtree:null,
+    connections:[['siofra','nokron'],['nokron','ainsel'],['ainsel','lakerot'],['siofra','deeproot'],['mohgwyn','deeproot']],
+  },
+  dlc: {
+    viewBox:'0 0 850 620',
+    land:'M 120 580 L 180 560 L 300 550 L 420 570 L 550 560 L 680 530 L 760 490 L 790 400 L 770 300 L 730 220 L 660 150 L 560 80 L 450 40 L 340 50 L 250 90 L 180 160 L 140 260 L 120 370 L 110 480 Z',
+    erdtree:null,
+    connections:[['gravesite','ensis'],['gravesite','cerulean'],['gravesite','jagged'],['ensis','scadu'],['scadu','shadowkeep'],['scadu','rauh'],['scadu','abyssal'],['shadowkeep','enirilim'],['rauh','enirilim']],
+  },
+};
+
+const fex='https://eldenring.wiki.fextralife.com/file/Elden-Ring/';
+
+// ============================= AREA DATA =============================
+const A=[
+// --- OVERWORLD ---
+{id:'limgrave',name:'Limgrave',map:'overworld',desc:'Region de depart. Explore bien avant Chateau Voilorage.',sx:540,sy:510,color:'#2e4a28',
+img:fex+'limgrave_reg_map_elden_ring_wiki_guide_1920px.jpg',
+items:[
+{id:'l01',name:'Kale le Marchand',type:'npc',desc:'Eglise d\'Elleh. Achete Kit de Fabrication + torche. Demande-lui le hurlement plus tard.',location:'Eglise d\'Elleh'},
+{id:'l02',name:'Varre au Masque Blanc',type:'npc',desc:'Premier PNJ. Se deplace a l\'Eglise de la Rose (Liurnia) ensuite.',location:'Grace "Le Premier Pas"'},
+{id:'l03',name:'Obtenir Torrent',type:'item',desc:'Repose a la grace Porte du Chateau-fort. Melina donne le destrier.',location:'Grace Porte du Chateau-fort'},
+{id:'l04',name:'Couteau a Aiguiser',type:'item',desc:'Coffre souterrain. Applique les Cendres de Guerre.',location:'Ruines de la Porte, sous-sol'},
+{id:'l05',name:'Cloche d\'Invocation',type:'item',missable:true,desc:'Eglise d\'Elleh la NUIT apres Torrent. Renna te la donne. Sinon achetable chez les Jumelles.',location:'Eglise d\'Elleh (nuit)'},
+{id:'l06',name:'Fiole Merveilleux Physick',type:'item',desc:'Fiole essentielle + Larme Sacree.',location:'Troisieme Eglise de Marika (est)'},
+{id:'l07',name:'Sentinelle de l\'Arbre',type:'boss',desc:'Chevalier dore a cheval. Trop dur au debut. Drop Hallebarde Doree.',location:'Devant Eglise d\'Elleh'},
+{id:'l08',name:'Boc le Couturier',type:'npc',missable:true,desc:'Frappe le buisson qui parle. Modifie vetements gratis. Ne donne PAS de Larve.',location:'Foret, pres telescope'},
+{id:'l09',name:'Alexandre Poing de Fer',type:'npc',desc:'Coince dans le sol. Frappe par derriere. Longue quete.',location:'Colline Orage, nord Lac Agheel'},
+{id:'l10',name:'Blaidd (Bois Brumeux)',type:'npc',missable:true,desc:'Hurlement dans Bois Brumeux. Demande a Kale → geste "Claquer des doigts".',location:'Ruines Bois Brumeux'},
+{id:'l11',name:'Dragon Volant Agheel',type:'boss',desc:'Dragon au lac. Combat a Torrent.',location:'Lac Agheel (centre)'},
+{id:'l12',name:'Chevalier Creuset',type:'boss',desc:'Difficile. Drop Aspects du Creuset: Queue.',location:'Geole Colline Orage'},
+{id:'l13',name:'Chevalier Limier Darriwil',type:'boss',desc:'Blaidd invocable. Drop Croc du Limier.',location:'Geole Limier Perdu'},
+{id:'l14',name:'Patches',type:'npc',missable:true,desc:'ARRETE quand il se rend ! Marchand + longue quete.',location:'Grotte Eaux Sombres'},
+{id:'l15',name:'Kenneth Haight',type:'npc',desc:'Reprendre Fort Haight. Lie a quete Nepheli.',location:'Ruines sud Bois Brumeux'},
+{id:'l16',name:'D, Chasseur de Morts',type:'npc',desc:'Parle du Marin Tibia → acces Sanctuaire Bestial.',location:'Pres Village Eaux Invocatrices'},
+{id:'l17',name:'Roderika',type:'npc',missable:true,desc:'Parle-lui AVANT Voilorage → PNJ amelioration esprits.',location:'Cabane Colline Orage'},
+{id:'l18',name:'Marin Tibia',type:'boss',desc:'Boss squelette bateau. Drop Racine-Mort.',location:'Village Eaux Invocatrices'},
+{id:'l19',name:'Reduvia (Dague)',type:'item',desc:'Bat Nerijus. Excellente arme saignement.',location:'Entree Catacombes Eaux Sombres'},
+]},
+{id:'weeping',name:'Peninsule des Lamentations',map:'overworld',desc:'Sud de Limgrave. Bonne zone XP.',sx:450,sy:650,color:'#2a4422',
+img:fex+'weeping_peninsula_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'w01',name:'Irina',type:'npc',missable:true,desc:'Pont. Lettre pour Edgar (Chateau Morne). Fin tragique.',location:'Pont du Sacrifice (nord)'},
+{id:'w02',name:'Edgar (Chateau Morne)',type:'npc',desc:'Pere Irina. Donne lettre. Part apres le boss.',location:'Remparts Chateau Morne'},
+{id:'w03',name:'Belluaire Leonin',type:'boss',desc:'Boss Morne. Drop Epee Greffee.',location:'Chateau Morne (plage sud)'},
+{id:'w04',name:'Avatar Arbre-Monde',type:'boss',desc:'Drop larmes physick.',location:'Arbre-Monde mineur'},
+{id:'w05',name:'Faux Ailee',type:'item',desc:'Excellente arme Foi.',location:'Ruines Tombeguet'},
+{id:'w06',name:'Oiseau de Mort',type:'boss',desc:'NUIT uniquement.',location:'Approche Morne (nuit)'},
+{id:'w07',name:'Tour du Retour',type:'location',desc:'Coffre teleporte au Pont Divin (Leyndell) pour loot.',location:'Sud-est peninsule'},
+]},
+{id:'stormveil',name:'Chateau Voilorage',map:'overworld',desc:'Premier donjon herite. Dense.',sx:420,sy:430,color:'#3a3a4a',
+img:fex+'stormveil_castle_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'s01',name:'Margit, le Maudit Augure',type:'boss',desc:'Premier gros boss. Entraves de Margit (Patches) = 2 paralysies.',location:'Entree chateau'},
+{id:'s02',name:'Godrick le Greffe',type:'boss',desc:'Premier demi-dieu. Grande Rune + Souvenir.',location:'Salle du trone'},
+{id:'s03',name:'Nepheli Loux',type:'npc',missable:true,desc:'Parle AVANT Godrick. Longue quete.',location:'Avant Cellule Reculee'},
+{id:'s04',name:'Rogier',type:'npc',missable:true,desc:'Balcon chapelle. Apres Godrick → Table Ronde. Lie a Ranni.',location:'Balcon chapelle'},
+{id:'s05',name:'Gostoc le Gardien',type:'npc',missable:true,desc:'Porte laterale. Vole tes runes. NE LE TUE PAS.',location:'Porte chateau'},
+{id:'s06',name:'Grande Rune Godrick',type:'item',desc:'Tour Divine Limgrave. +5 toutes stats.',location:'Bat Godrick → Tour Divine'},
+{id:'s07',name:'Lame Pierre de Peche',type:'item',desc:'Affinites Lourd/Affute/Qualite.',location:'Salle fermee (Pierre Epee)'},
+{id:'s08',name:'Esprit Arbre Ulcere',type:'boss',desc:'Boss cache sous-sol.',location:'Sous-sol (cave a vin)'},
+{id:'s09',name:'Memento Chrysalides',type:'item',missable:true,desc:'Donne a Roderika → amelioration esprits.',location:'Pres Rejeton Greffe'},
+]},
+{id:'liurnia',name:'Liurnia des Lacs',map:'overworld',desc:'Vaste region lacustre. Zone cle pour quetes.',sx:320,sy:340,color:'#1e3a5a',
+img:fex+'liurnia_of_the_lakes_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'li01',name:'Ranni la Sorciere',type:'npc',desc:'Trois Soeurs. Mega-quete → fin "Age des Etoiles".',location:'Tour de Ranni (nord-ouest)'},
+{id:'li02',name:'Salle Etude Caria',type:'location',desc:'Inversee avec objet Ranni → Tour Divine Liurnia.',location:'Est Liurnia'},
+{id:'li03',name:'Village Albinauriques',type:'location',desc:'Frappe la jarre (Albus) → Medaillon Secret Haligtree (droite).',location:'Sud-ouest, sous falaise'},
+{id:'li04',name:'Latenna',type:'npc',desc:'Cendres esprit. Quete = l\'emmener Champ Neige Consacre.',location:'Grotte Cristal Bord Lac'},
+{id:'li05',name:'Thops',type:'npc',missable:true,desc:'Veut Cle Glintstone de rechange (Academie).',location:'Eglise d\'Irith'},
+{id:'li06',name:'Hyetta',type:'npc',missable:true,desc:'Veut 3 Raisins Shabriri → fin Flamme Frenetique.',location:'Falaises Face au Lac'},
+{id:'li07',name:'Varre (Eglise Rose)',type:'npc',desc:'Quete → acces precoce Palais Mohgwyn.',location:'Eglise Rose (sud-ouest)'},
+{id:'li08',name:'Cle Glintstone',type:'item',desc:'Derriere Dragon Smarag. Ouvre Academie.',location:'Ouest porte Academie'},
+{id:'li09',name:'Loretta (Manoir Caria)',type:'boss',desc:'Boss Manoir Caria.',location:'Manoir Caria (nord-ouest)'},
+{id:'li10',name:'Epee Nuit et Flamme',type:'item',desc:'Arme INT/FOI cachee Manoir Caria.',location:'Manoir Caria, passage bas'},
+{id:'li11',name:'Seluvis / Pidia',type:'npc',missable:true,desc:'Tour Seluvis (quete Ranni). Marionnettes secretes.',location:'Tour Seluvis / Manoir Caria'},
+{id:'li12',name:'Iji le Forgeron',type:'npc',desc:'Forgeron de Ranni.',location:'Route du Manoir'},
+]},
+{id:'academy',name:'Academie Raya Lucaria',map:'overworld',desc:'Deuxieme donjon herite. Sorcellerie.',sx:410,sy:300,color:'#253a6a',
+img:fex+'academy_of_raya_lucaria_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'a01',name:'Loup Rouge Radagon',type:'boss',desc:'Mid-boss rapide.',location:'Parloir Debat'},
+{id:'a02',name:'Rennala, Reine Pleine Lune',type:'boss',desc:'Boss principal. Phase 1 + Phase 2.',location:'Grande Bibliotheque'},
+{id:'a03',name:'Rennala (Respec)',type:'npc',desc:'Larves Larvaires pour redistribuer stats.',location:'Grande Bibliotheque'},
+{id:'a04',name:'Icone Radagon',type:'item',desc:'Reduit temps incantation.',location:'Parloir Debat, 2e etage'},
+{id:'a05',name:'Cle Glintstone extra',type:'item',missable:true,desc:'Pour Thops a Eglise Irith.',location:'Lustre Eglise du Coucou'},
+]},
+{id:'caelid',name:'Caelid & Dragonterrier',map:'overworld',desc:'Pourriture Ecarlate. Niveau superieur.',sx:730,sy:430,color:'#5a2a1a',
+img:fex+'caelid_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'c01',name:'Commandant O\'Neil',type:'boss',desc:'Marecage. Drop Aiguille Or (quete Millicent).',location:'Marecage Aeonia'},
+{id:'c02',name:'Festival Radahn',type:'boss',desc:'Combat festival massif. Ouvre Nokron.',location:'Chateau Criniere Rouge'},
+{id:'c03',name:'Millicent',type:'npc',missable:true,desc:'Donne Aiguille Or. Longue quete critique.',location:'Eglise Peste'},
+{id:'c04',name:'Gurranq, Clerc Bestial',type:'npc',desc:'Donne 9 Racines-Mort → incantations.',location:'Sanctuaire Bestial'},
+{id:'c05',name:'Sellia, Ville Sorcellerie',type:'location',desc:'3 braseros toits → barrieres.',location:'Centre Caelid'},
+{id:'c06',name:'Greyoll Dragon Ancien',type:'boss',desc:'~80K runes + 5 Coeurs Dragon.',location:'Dragonterrier'},
+{id:'c07',name:'Fort Faroth',type:'location',desc:'Soreseal Radagon + moitie Medaillon Dectus.',location:'Dragonterrier'},
+{id:'c08',name:'Grotte Abandonnee',type:'location',desc:'Drop Scarabee Or (+20% runes).',location:'Ravin Caelid'},
+{id:'c09',name:'Gowry',type:'npc',desc:'Demande aider Millicent.',location:'Cabane Gowry, sud Sellia'},
+]},
+{id:'altus',name:'Plateau d\'Altus',map:'overworld',desc:'Via Ascenseur Dectus ou Precipice Ruines.',sx:380,sy:215,color:'#3a3a20',
+img:fex+'altus_plateau_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'al01',name:'Grand Ascenseur Dectus',type:'location',desc:'2 moities Medaillon: Fort Haight + Fort Faroth.',location:'Entre Liurnia et Altus'},
+{id:'al02',name:'Precipice Ruines',type:'location',desc:'Route alternative. Boss: Wyrm Magma Makar.',location:'Nord Liurnia, ravin'},
+{id:'al03',name:'Masque d\'Or',type:'npc',missable:true,desc:'Pont casse. Fin "Age de l\'Ordre".',location:'Pont Contemplation Arbre'},
+{id:'al04',name:'Frere Corhyn',type:'npc',desc:'Dis-lui ou est Masque Or.',location:'Jonction Grand-Route'},
+{id:'al05',name:'Chateau Ombrage',type:'location',desc:'Boss drop Prothese Valkyrie (Millicent).',location:'Nord Altus, ravin'},
+{id:'al06',name:'Dominiula (Moulin)',type:'location',desc:'Village flippant. Boss: Apotre Peau-de-Dieu.',location:'Nord Altus'},
+]},
+{id:'gelmir',name:'Mont Gelmir & Manoir Volcan',map:'overworld',desc:'Zone volcanique. Contrats assassinat.',sx:195,sy:215,color:'#4a2a18',
+img:fex+'mt_gelmir_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'g01',name:'Manoir Volcan - Rejoindre',type:'npc',missable:true,desc:'Parle a Tanith. 3 contrats avant Rykard.',location:'Manoir Volcan'},
+{id:'g02',name:'Rya / Zorayas',type:'npc',missable:true,desc:'D\'abord Liurnia. Au Manoir, decouvre son secret.',location:'Manoir Volcan'},
+{id:'g03',name:'Patches (Manoir)',type:'npc',desc:'Contrat. Longue quete.',location:'Couloir Manoir'},
+{id:'g04',name:'Rykard, Seigneur Blaspheme',type:'boss',desc:'UTILISE lance Chasseur Serpent a l\'entree.',location:'Profondeurs Manoir'},
+{id:'g05',name:'Contrats Assassinat (3)',type:'quest',missable:true,desc:'Istvan (Limgrave), Rileigh (Altus), Hoslow (Cimes). AVANT Rykard.',location:'Salon Manoir'},
+{id:'g06',name:'Bete Etoiles Adulte',type:'boss',desc:'Sommet. Drop Machoire + Clochette Mineur.',location:'Sommet Mt Gelmir'},
+{id:'g07',name:'Comete Azur',type:'item',desc:'Sorcellerie legendaire.',location:'Pres Village Ermite'},
+]},
+{id:'leyndell',name:'Leyndell, Capitale Royale',map:'overworld',desc:'Immense cite. Beaucoup de zones cachees.',sx:540,sy:190,color:'#4a4420',
+img:fex+'leyndell_royal_capital_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'le01',name:'Sentinelle Draconique',type:'boss',desc:'Garde entree. Foudre + cheval.',location:'Entree capitale'},
+{id:'le02',name:'Godfrey (Dore)',type:'boss',desc:'Fantome dore spectaculaire.',location:'Sanctuaire Arbre-Monde'},
+{id:'le03',name:'Morgott, Roi Augure',type:'boss',desc:'Boss principal. Grande Rune.',location:'Trone Elden'},
+{id:'le04',name:'Eclair de Gransax',type:'item',missable:true,desc:'DEFINITIVEMENT MANQUABLE apres brule Arbre. Armement legendaire.',location:'Lance/dragon dans capitale'},
+{id:'le05',name:'Egouts Souterrains',type:'location',missable:true,desc:'Devorant, Trois Doigts, Mohg Augure.',location:'Puits capitale basse'},
+{id:'le06',name:'Devorant de Souillures',type:'npc',missable:true,desc:'Egouts. 5 Maledictions en Graine → sa fin.',location:'Egouts Souterrains'},
+{id:'le07',name:'Les Trois Doigts',type:'location',missable:true,desc:'Fond egouts. Flamme Frenetique BLOQUE autres fins (reversible Aiguille Miquella).',location:'Tout en bas Egouts'},
+{id:'le08',name:'Mohg l\'Augure',type:'boss',desc:'Dans egouts. Pas le vrai Mohg.',location:'Egouts (profondeurs)'},
+{id:'le09',name:'Masque Or au Colisee',type:'npc',missable:true,desc:'Si quete avancee. Dis resultat Loi Regression.',location:'Pont Colisee'},
+]},
+{id:'mountaintops',name:'Cimes des Geants',map:'overworld',desc:'Zone enneigee endgame.',sx:680,sy:115,color:'#3a4454',
+img:fex+'mountaintops_of_the_giants_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'mt01',name:'Geant de Feu',type:'boss',desc:'Obligatoire. Apres = bruler Arbre.',location:'Forge des Geants'},
+{id:'mt02',name:'Forge des Geants',type:'location',missable:true,desc:'Bruler Arbre change Leyndell DEFINITIVEMENT. Tout recuperer AVANT!',location:'Au-dela Geant de Feu'},
+{id:'mt03',name:'Chateau Sol',type:'location',desc:'Medaillon Secret Haligtree (gauche). Boss: Niall.',location:'Nord-est Cimes'},
+{id:'mt04',name:'Commandant Niall',type:'boss',desc:'Invoque 2 chevaliers. Drop Medaillon.',location:'Chateau Sol'},
+{id:'mt05',name:'Borealis',type:'boss',desc:'Dragon de glace.',location:'Lac gele'},
+]},
+{id:'snowfield',name:'Champ Neige Consacre',map:'overworld',desc:'Zone cachee. 2 moities Medaillon Secret.',sx:560,sy:55,color:'#404a5a',
+img:fex+'consecrated_snowfield_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'sn01',name:'Ascenseur Rold (Secret)',type:'location',desc:'Medaillon Secret au lieu de Medaillon Rold.',location:'Grand Ascenseur Rold'},
+{id:'sn02',name:'Ordina Liturgique',type:'location',desc:'Geole: 4 bougies → chemin Haligtree.',location:'Nord-est Champ Neige'},
+{id:'sn03',name:'Portail Mohgwyn',type:'location',desc:'Teleporteur Mohgwyn. Alternative Varre.',location:'Ouest Champ Neige'},
+{id:'sn04',name:'Fin quete Latenna',type:'npc',desc:'Amene Latenna a la geante Albinaurique.',location:'Apostate Derelict'},
+]},
+{id:'haligtree',name:'Haligtree de Miquella',map:'overworld',desc:'Optionnel endgame. Malenia.',sx:380,sy:45,color:'#3a3050',
+img:fex+'miquellas_haligtree_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'h01',name:'Loretta (Haligtree)',type:'boss',desc:'Premier boss majeur.',location:'Ville Haligtree'},
+{id:'h02',name:'Malenia, Lame Miquella',type:'boss',desc:'BOSS LE PLUS DUR. Se soigne. Danse Oiseaux Eau. Phase 2 Pourriture.',location:'Racines Haligtree'},
+{id:'h03',name:'Millicent (Finale)',type:'npc',missable:true,desc:'AIDE-LA → Aiguille Miquella (reverse Flamme Frenetique).',location:'Salle Priere / Canal Drainage'},
+{id:'h04',name:'Aiguille Miquella',type:'item',missable:true,desc:'Utilise a Farum Azula (arene Placidusax) pour annuler Flamme Frenetique.',location:'Recompense Millicent'},
+]},
+{id:'farum',name:'Farum Azula Croulant',map:'overworld',desc:'Endgame obligatoire. Apres brule Arbre.',sx:840,sy:75,color:'#353545',
+img:fex+'crumbling_farum_azula_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'f01',name:'Duo Peaux-de-Dieu',type:'boss',desc:'Pots de Sommeil pour endormir l\'un.',location:'Temple Dragon'},
+{id:'f02',name:'Seigneur Dragon Placidusax',type:'boss',desc:'Boss cache. Allonge-toi. Arene Aiguille Miquella.',location:'Sous "Pres Grand Pont"'},
+{id:'f03',name:'Maliketh, Lame Noire',type:'boss',desc:'Obligatoire. Phase 1 Gurranq, Phase 2 Maliketh.',location:'Au-dela Temple Dragon'},
+{id:'f04',name:'Invasion Bernahl',type:'npc',desc:'Si contrats faits. Drop Sceptre Devoreur.',location:'Pres Grand Pont'},
+]},
+
+// --- UNDERGROUND ---
+{id:'siofra',name:'Riviere Siofra',map:'underground',desc:'Puits Bois Brumeux. Caverne etoilee.',sx:200,sy:280,color:'#1a2a4a',
+img:fex+'siofra_river_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'si01',name:'Esprit Ancestral',type:'boss',desc:'Allume 8 piliers flamme.',location:'Corne Hallowe'},
+{id:'si02',name:'Blaidd (Quete Ranni)',type:'npc',desc:'Il cherche Nokron.',location:'Rive Siofra'},
+{id:'si03',name:'Soldat Draconique',type:'boss',desc:'Drop Lance Eclair Givree.',location:'Riviere Siofra'},
+]},
+{id:'nokron',name:'Nokron, Cite Eternelle',map:'underground',desc:'Apres Radahn. Critique quete Ranni.',sx:200,sy:110,color:'#1a2040',
+img:fex+'nokron_eternal_city_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'n01',name:'Larme Imitatrice (Boss)',type:'boss',desc:'Copie ton perso. Enleve equip avant brouillard.',location:'Nokron'},
+{id:'n02',name:'Cendres Larme Imitatrice',type:'item',desc:'MEILLEURE invocation. Coffre Pierre Epee.',location:'Apres boss Larme'},
+{id:'n03',name:'Lame Tueuse Doigts',type:'item',desc:'Objet cle quete Ranni.',location:'Terre Sacree Nuit'},
+{id:'n04',name:'Lame Aiguiser Noire',type:'item',desc:'Affinites Poison/Saignement/Occulte.',location:'Terre Sacree Nuit'},
+]},
+{id:'ainsel',name:'Riviere Ainsel',map:'underground',desc:'Quete Ranni.',sx:420,sy:190,color:'#1a2848',
+img:fex+'ainsel_river_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'ai01',name:'Ranni Miniature',type:'item',desc:'Cercueil Ainsel Main. Parle-lui a grace (x3).',location:'Riviere Ainsel Main'},
+{id:'ai02',name:'Nokstella',type:'location',desc:'Talisman Lune Nokstella (+2 memoire).',location:'Via Ainsel Main'},
+{id:'ai03',name:'Lune de Nokstella',type:'item',desc:'+2 emplacements memoire.',location:'Coffre Nokstella'},
+]},
+{id:'deeproot',name:'Profondeurs Racines',map:'underground',desc:'Via Aqueduc Siofra ou Egouts.',sx:420,sy:380,color:'#1a2830',
+img:fex+'deeproot_depths_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'d01',name:'Champions de Fia',type:'boss',desc:'Serie combats PNJ.',location:'Profondeurs Racines'},
+{id:'d02',name:'Fia (Age Crepuscule)',type:'npc',missable:true,desc:'Donne Marque Maudite Mort. Bat Lichdragon Fortissax.',location:'Trone Prince Mort'},
+{id:'d03',name:'Lichdragon Fortissax',type:'boss',desc:'Reve de Fia.',location:'Reve de Fia'},
+{id:'d04',name:'Armure Arbre Creuset',type:'item',desc:'Cachee sur branche. Top armure.',location:'Sur une racine'},
+]},
+{id:'lakerot',name:'Lac de Pourriture',map:'underground',desc:'Quete Ranni. Amene des soins.',sx:600,sy:110,color:'#4a1a1a',
+img:fex+'lake_of_rot_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'lr01',name:'Plateformes',type:'location',desc:'Plaques pression pour lever plateformes.',location:'A travers le lac'},
+{id:'lr02',name:'Astel, Fille du Vide',type:'boss',desc:'Boss cle Ranni. Ouvre Autel Lunaire.',location:'Grand Cloitre (cercueil)'},
+{id:'lr03',name:'Dard Scorpion',type:'item',desc:'Dague Pourriture.',location:'Grand Cloitre'},
+]},
+{id:'mohgwyn',name:'Palais Mohgwyn',map:'underground',desc:'Via quete Varre ou Champ Neige.',sx:620,sy:320,color:'#4a1020',
+img:fex+'mohgwyn_dynasty_mausoleum_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'m01',name:'Mohg, Seigneur du Sang',type:'boss',desc:'Entraves Mohg + Larme Purificatrice.',location:'Trone Palais'},
+{id:'m02',name:'Spot Farm Runes',type:'location',desc:'Albinauriques pres grace = enorme runes.',location:'Grace Approche Palais'},
+{id:'m03',name:'Talisman Exultation',type:'item',desc:'Boost attaque hemorragie.',location:'Mausolee Mohgwyn'},
+{id:'m04',name:'Acces DLC',type:'location',desc:'Apres Mohg → cocon Miquella.',location:'Derriere arene Mohg'},
+]},
+
+// --- DLC ---
+{id:'gravesite',name:'Plaine du Cimetiere',map:'dlc',desc:'Depart DLC. Fragments Scadutree CRITIQUES.',sx:420,sy:520,color:'#2a3828',
+img:fex+'gravesite_plain_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'gp01',name:'Fragments Scadutree',type:'item',desc:'Systeme niveau DLC. CRITIQUE. Sans eux = 0 degats.',location:'Eglises, statues, etc.'},
+{id:'gp02',name:'Cendres Esprit Reverees',type:'item',desc:'Esprits au-dela +10.',location:'Sources esprit DLC'},
+{id:'gp03',name:'Golem Fournaise',type:'boss',desc:'Geant. Gros Pot Feu dans panier.',location:'Plusieurs dans DLC'},
+{id:'gp04',name:'Leda',type:'npc',desc:'PNJ cle DLC. Loyaute compte.',location:'Grace Croix Ruine'},
+{id:'gp05',name:'Bete Divine Lion Dansant',type:'boss',desc:'Premier boss DLC a Belurat.',location:'Belurat'},
+{id:'gp06',name:'Belurat',type:'location',desc:'Premier donjon herite DLC.',location:'Nord-est Plaine'},
+{id:'gp07',name:'Hornsent',type:'npc',desc:'PNJ majeur. Quete embranchements.',location:'Plaine / Belurat'},
+{id:'gp08',name:'Croix Miquella',type:'location',desc:'Croix dorees = histoire.',location:'Partout DLC'},
+]},
+{id:'ensis',name:'Chateau Ensis',map:'dlc',desc:'Bloque chemin Scadu Altus.',sx:420,sy:400,color:'#2a2a4a',
+img:fex+'castle_ensis_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'en01',name:'Rellana, Double Lune',type:'boss',desc:'Deux epees magie + feu.',location:'Chateau Ensis'},
+{id:'en02',name:'Sorcelleries Caria',type:'item',desc:'Plusieurs dans le chateau.',location:'Chateau Ensis'},
+]},
+{id:'scadu',name:'Scadu Altus',map:'dlc',desc:'Zone centrale DLC.',sx:420,sy:280,color:'#2a3020',
+img:fex+'scadu_altus_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'sc01',name:'Hippopotame Dore',type:'boss',desc:'Premier boss Forteresse.',location:'Entree Forteresse'},
+{id:'sc02',name:'Ruines Moorth',type:'location',desc:'Zone souterraine + loot.',location:'Centre Scadu'},
+{id:'sc03',name:'Fragments Scadutree',type:'item',desc:'Eglises et croix.',location:'Eglises Scadu'},
+{id:'sc04',name:'Village Bonny',type:'location',desc:'PNJ + connexion Bois Abyssaux.',location:'Est Scadu'},
+]},
+{id:'shadowkeep',name:'Forteresse de l\'Ombre',map:'dlc',desc:'Donjon herite majeur DLC.',sx:420,sy:160,color:'#2a2028',
+img:fex+'shadow_keep_location_map_elden_ring_wiki_guide_2560px.jpg',
+items:[
+{id:'sk01',name:'Messmer l\'Empaleur',type:'boss',desc:'Demi-dieu DLC. Lance feu.',location:'Chambre Obscure'},
+{id:'sk02',name:'Chevalier Feu Queelign',type:'npc',desc:'Envahisseur/allie selon choix.',location:'Forteresse'},
+{id:'sk03',name:'Entrepot Specimens',type:'location',desc:'Section superieure. Boss + loot.',location:'Etages superieurs'},
+]},
+{id:'rauh',name:'Ruines Anciennes Rauh',map:'dlc',desc:'Ruines antiques verdoyantes.',sx:210,sy:180,color:'#1a3020',
+items:[
+{id:'ra01',name:'Romina, Sainte Bourgeon',type:'boss',desc:'Boss Pourriture. Garde chemin Enir-Ilim.',location:'Eglise Bourgeon'},
+{id:'ra02',name:'Zone Rauh',type:'location',desc:'Armes uniques et cendres guerre.',location:'Depuis Forteresse ou Scadu'},
+]},
+{id:'abyssal',name:'Bois Abyssaux',map:'dlc',desc:'Horreur/infiltration. Ennemis inguables. COURS.',sx:660,sy:300,color:'#1a1428',
+items:[
+{id:'ab01',name:'Midra, Seigneur Flamme',type:'boss',desc:'Boss tragique. Drop Souvenir.',location:'Manoir Midra'},
+{id:'ab02',name:'Ennemis Folie',type:'location',desc:'Inguables. Infiltration + course.',location:'Bois Abyssaux'},
+{id:'ab03',name:'Manoir Midra',type:'location',desc:'Donjon horreur.',location:'Fond Bois'},
+]},
+{id:'cerulean',name:'Cote Ceruleenne',map:'dlc',desc:'Zone cotiere cachee.',sx:160,sy:480,color:'#1a2a4a',
+items:[
+{id:'cc01',name:'Chevalier Putride',type:'boss',desc:'Chevalier spectral a cheval.',location:'Fissure Cercueil Pierre'},
+{id:'cc02',name:'Loot Cote',type:'item',desc:'Armes/armures uniques.',location:'Grottes et ruines'},
+]},
+{id:'jagged',name:'Pic Dentele',map:'dlc',desc:'Montagne dragons. Bayle le Terrible.',sx:700,sy:460,color:'#2a2a2a',
+items:[
+{id:'jp01',name:'Bayle le Terrible',type:'boss',desc:'Boss dragon ultime.',location:'Sommet Pic'},
+{id:'jp02',name:'Igon',type:'npc',desc:'Chasseur dragons. Invocable pour Bayle.',location:'Chemin Pic'},
+{id:'jp03',name:'Dragons multiples',type:'boss',desc:'Mini-boss en montant.',location:'Pic Dentele'},
+]},
+{id:'enirilim',name:'Enir-Ilim',map:'dlc',desc:'Zone finale DLC.',sx:420,sy:50,color:'#2a2040',
+items:[
+{id:'ei01',name:'Leda & Defi PNJ',type:'boss',missable:true,desc:'Selon tes choix de quetes.',location:'Approche Enir-Ilim'},
+{id:'ei02',name:'Radahn, Consort Miquella',type:'boss',desc:'Boss final DLC. 2 phases.',location:'Enir-Ilim, sommet'},
+{id:'ei03',name:'Fin DLC',type:'location',desc:'Ne bloque AUCUNE fin jeu de base.',location:'Apres boss final'},
+]},
+];
+
+// ============================= QUESTS =============================
+const quests=[
+{id:'ranni',name:'Ranni la Sorciere',ending:'Age des Etoiles',steps:[
+{area:'liurnia',text:'Tour de Ranni aux Trois Soeurs (apres Manoir Caria). Accepte de la servir.',missable:true},
+{area:'liurnia',text:'Parle a Blaidd, Iji et Seluvis pres de la Tour.'},
+{area:'siofra',text:'Retrouve Blaidd Riviere Siofra. Il cherche Nokron.'},
+{area:'caelid',text:'Bat Radahn au festival → ouvre Nokron.'},
+{area:'nokron',text:'Nokron → Lame Tueuse Doigts (Terre Sacree Nuit).'},
+{area:'liurnia',text:'Donne Lame a Ranni → Statue Inversee Caria.'},
+{area:'liurnia',text:'Statue a Salle Etude → Tour Divine → Marque Maudite Mort.'},
+{area:'ainsel',text:'Portail Tour Ranni → Ainsel Main. Ranni Miniature. Parle-lui grace (x3).'},
+{area:'ainsel',text:'Bat Ombre Maudite → Cle Palais Abandonne.'},
+{area:'lakerot',text:'Lac Pourriture → cercueil Grand Cloitre → bat Astel.'},
+{area:'liurnia',text:'Autel Lunaire → Cathedrale Manus Celes. Anneau Lune Noire a Ranni.'},
+{area:'leyndell',text:'Apres boss final → signe invocation Ranni (bleu).'},
+]},
+{id:'fia',name:'Fia, Compagne Lit de Mort',ending:'Age du Crepuscule',steps:[
+{area:'leyndell',text:'Table Ronde. Accepte etreinte Fia.'},
+{area:'leyndell',text:'Donne Dague Abimee a Fia (quete Rogier).',missable:true},
+{area:'leyndell',text:'D mort. Recupere Armure Jumelee.'},
+{area:'deeproot',text:'Profondeurs Racines. Bat Champions Fia.'},
+{area:'deeproot',text:'Donne Marque Maudite Mort a Fia.',missable:true},
+{area:'deeproot',text:'Repose → reve → bat Lichdragon Fortissax.'},
+{area:'deeproot',text:'Rune Reparation Prince Mort.'},
+]},
+{id:'goldmask',name:'Masque d\'Or & Corhyn',ending:'Age de l\'Ordre',steps:[
+{area:'altus',text:'Corhyn Table Ronde puis Altus. Masque Or sur pont casse.',missable:true},
+{area:'altus',text:'Dis a Corhyn ou est Masque Or.'},
+{area:'leyndell',text:'Masque Or Colisee Leyndell. Loi Regression (37 INT).',missable:true},
+{area:'leyndell',text:'Dis resultat: Radagon est Marika.'},
+{area:'leyndell',text:'Apres brule Arbre → Leyndell Cendres. Trouve-les.',missable:true},
+{area:'leyndell',text:'Rune Reparation Ordre Parfait.'},
+]},
+{id:'dungeater',name:'Devorant de Souillures',ending:'Benediction du Desespoir',steps:[
+{area:'leyndell',text:'Message Table Ronde (fantome rouge).'},
+{area:'leyndell',text:'Cle Geoles Egouts. Trouve le Devorant.'},
+{area:'leyndell',text:'5 Maledictions en Graine.',missable:true},
+{area:'leyndell',text:'Nourris les 5 → Rune Malediction Infame.'},
+]},
+{id:'millicent',name:'Millicent',ending:null,steps:[
+{area:'caelid',text:'Bat O\'Neil (Marecage) → Aiguille Or.'},
+{area:'caelid',text:'Cabane Gowry → apporter aiguille a Millicent.'},
+{area:'caelid',text:'Donne Aiguille a Eglise Peste.',missable:true},
+{area:'altus',text:'Millicent Contemplation Arbre. Donne Prothese Valkyrie.',missable:true},
+{area:'mountaintops',text:'Millicent aux Cimes des Geants.'},
+{area:'haligtree',text:'Haligtree: AIDE-LA → Aiguille Or rendue.',missable:true},
+{area:'haligtree',text:'Aiguille sur fleur Malenia → Aiguille Miquella → Farum annule Flamme.',missable:true},
+]},
+{id:'alexander',name:'Alexandre Poing de Fer',ending:null,steps:[
+{area:'limgrave',text:'Libere du sol Colline Orage (frappe derriere).'},
+{area:'caelid',text:'Festival Radahn.'},
+{area:'liurnia',text:'Coince pres Cabane Artiste. Pot Huile + frappe.',missable:true},
+{area:'gelmir',text:'Pres Terminus Eaux Bouillantes.'},
+{area:'farum',text:'Duel Farum → Eclat Alexandre (talisman).',missable:true},
+]},
+{id:'varre',name:'Varre au Masque Blanc',ending:null,steps:[
+{area:'limgrave',text:'Premier Pas. "Sans-damoiselle".'},
+{area:'liurnia',text:'Eglise Rose. Envahis 3 fois.'},
+{area:'liurnia',text:'Faveur Seigneur Sang. Trempe dans sang damoiselle.'},
+{area:'liurnia',text:'Medal Chevalier Sang → teleport Mohgwyn.'},
+]},
+{id:'sellen',name:'Sorciere Sellen',ending:null,steps:[
+{area:'limgrave',text:'Sous-sol Ruines Point Passage. Prof sorcellerie.'},
+{area:'caelid',text:'Lusat dans Cachette Sellia → Etoiles Ruine.'},
+{area:'gelmir',text:'Azur Mt Gelmir → Comete Azur.'},
+{area:'limgrave',text:'Vrai corps Ruines Brulebane → Pierre Glintstone.'},
+{area:'liurnia',text:'Pierre au corps Trois Soeurs. Camp Sellen ou Jerren.',missable:true},
+]},
+];
+
+const endings=[
+{name:'Seigneur Elden (Defaut)',req:'Bat Radagon / Bete Elden. Repare l\'Elden Ring.'},
+{name:'Age des Etoiles (Ranni)',req:'Complete quete Ranni. Signe invocation bleu apres boss final.'},
+{name:'Age du Crepuscule (Fia)',req:'Rune Reparation Prince Mort via quete Fia.'},
+{name:'Age de l\'Ordre (Masque Or)',req:'Rune Reparation Ordre Parfait. Necessite 37 INT.'},
+{name:'Benediction Desespoir (Devorant)',req:'Rune Malediction Infame. 5 Maledictions en Graine.'},
+{name:'Seigneur Flamme Frenetique',req:'Trois Doigts, fond Egouts Leyndell. Retire armure.',
+warn:'BLOQUE TOUTES AUTRES FINS. Seul moyen: Aiguille Miquella (quete Millicent) arene Placidusax Farum Azula.'},
+];
+
+// ============================= STATE =============================
+let ck=JSON.parse(localStorage.getItem('er4_ck')||'{}');
+let qk=JSON.parse(localStorage.getItem('er4_qk')||'{}');
+let curArea=null,curView='map',curMap='overworld',curFilter='all';
+function save(){localStorage.setItem('er4_ck',JSON.stringify(ck));localStorage.setItem('er4_qk',JSON.stringify(qk))}
+
+// ============================= WORLD MAP =============================
+function showMap(id,el){curMap=id;document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');renderMap()}
+
+function renderMap(){
+  const ml=mapLayout[curMap];
+  const areas=A.filter(a=>a.map===curMap);
+  const rw=140,rh=44;
+  let svg=`<svg viewBox="${ml.viewBox}" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,sans-serif">`;
+  svg+=`<defs><radialGradient id="erdtreeGrad"><stop offset="0%" stop-color="#c8a84e" stop-opacity=".3"/><stop offset="100%" stop-color="#c8a84e" stop-opacity="0"/></radialGradient></defs>`;
+  if(ml.land) svg+=`<path class="land" d="${ml.land}" opacity=".6"/>`;
+  if(ml.erdtree){
+    const e=ml.erdtree;
+    svg+=`<circle class="erdtree-glow" cx="${e.x}" cy="${e.y-10}" r="60"/>`;
+    svg+=`<line class="erdtree-trunk" x1="${e.x}" y1="${e.y+15}" x2="${e.x}" y2="${e.y-40}"/>`;
+    svg+=`<line class="erdtree-trunk" x1="${e.x}" y1="${e.y-20}" x2="${e.x-15}" y2="${e.y-35}"/>`;
+    svg+=`<line class="erdtree-trunk" x1="${e.x}" y1="${e.y-20}" x2="${e.x+15}" y2="${e.y-35}"/>`;
+    svg+=`<line class="erdtree-trunk" x1="${e.x}" y1="${e.y-10}" x2="${e.x-20}" y2="${e.y-28}"/>`;
+    svg+=`<line class="erdtree-trunk" x1="${e.x}" y1="${e.y-10}" x2="${e.x+20}" y2="${e.y-28}"/>`;
+  }
+  ml.connections.forEach(([f,t])=>{const a1=A.find(a=>a.id===f),a2=A.find(a=>a.id===t);if(a1&&a2)svg+=`<line class="conn" x1="${a1.sx}" y1="${a1.sy}" x2="${a2.sx}" y2="${a2.sy}"/>`});
+  areas.forEach(a=>{
+    const total=a.items.length,done=a.items.filter(i=>ck[i.id]).length;
+    const pct=total>0?Math.round(done/total*100):0;
+    const hasMiss=a.items.some(i=>i.missable&&!ck[i.id]);
+    const x=a.sx-rw/2,y=a.sy-rh/2;
+    const pbw=rw-20;
+    let cls='region';if(pct===100)cls+=' done';
+    svg+=`<g class="${cls}" onclick="selectArea('${a.id}')">`;
+    svg+=`<rect class="rbg" x="${x}" y="${y}" width="${rw}" height="${rh}" fill="${a.color||'#1a1a2e'}"/>`;
+    svg+=`<text class="rlbl" x="${a.sx}" y="${a.sy-2}">${a.name}</text>`;
+    svg+=`<rect class="rpbar-bg" x="${x+10}" y="${a.sy+10}" width="${pbw}" height="4"/>`;
+    svg+=`<rect class="rpbar" x="${x+10}" y="${a.sy+10}" width="${pbw*pct/100}" height="4"/>`;
+    svg+=`<text class="rpct" x="${a.sx}" y="${a.sy+24}">${pct}%</text>`;
+    if(hasMiss)svg+=`<circle class="miss-dot" cx="${x+rw-6}" cy="${y+6}" r="4"/>`;
+    svg+=`</g>`;
+  });
+  if(curMap==='overworld')svg+=`<text class="floating-label" x="840" y="50">(flottant)</text>`;
+  svg+=`</svg>`;
+  document.getElementById('mapCont').innerHTML=svg;
+}
+
+// ============================= AREA DETAIL VIEW =============================
+function selectArea(id){
+  curArea=id;
+  const a=A.find(x=>x.id===id);if(!a)return;
+
+  // Hide world map, show area view
+  document.getElementById('mapWrap').classList.add('hidden');
+  document.getElementById('areaView').classList.remove('hidden');
+
+  // Area panel header
+  document.getElementById('apTitle').textContent=a.name;
+  document.getElementById('apDesc').textContent=a.desc;
+  const total=a.items.length,done=a.items.filter(i=>ck[i.id]).length;
+  const miss=a.items.filter(i=>i.missable).length;
+  const pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('apStats').innerHTML=`<div class="dstat"><span>${done}/${total}</span> fait</div>${miss?`<div class="dstat" style="color:var(--red)"><span>${miss}</span> manquable(s)</div>`:''}`;
+  document.getElementById('apBar').style.width=pct+'%';
+
+  // Area map image
+  const mc=document.getElementById('areaMapContent');
+  if(a.img){
+    mc.innerHTML=`<img class="area-map-img" src="${a.img}" alt="${a.name}" onerror="this.parentElement.innerHTML='<div class=area-map-fallback><span class=fallback-icon>&#9876;</span><b>${a.name}</b><p>Carte non disponible.<br>Consulte la checklist a droite.</p></div>'">`;
+  } else {
+    mc.innerHTML=`<div class="area-map-fallback"><span class="fallback-icon">&#9876;</span><b>${a.name}</b><p>Carte non disponible.<br>Consulte la checklist a droite.</p></div>`;
+  }
+
+  renderCklist(a);
+}
+
+function backToMap(){
+  curArea=null;
+  document.getElementById('areaView').classList.add('hidden');
+  document.getElementById('mapWrap').classList.remove('hidden');
+  renderMap();
+}
+
+// ============================= CHECKLIST =============================
+const typeNames={boss:'Boss',npc:'PNJ',item:'Objets',location:'Lieux',quest:'Quetes'};
+
+function renderCklist(a){
+  const c=document.getElementById('cklist');
+  const search=document.getElementById('searchIn').value.toLowerCase();
+  const groups={boss:[],npc:[],item:[],location:[],quest:[]};
+  a.items.forEach(i=>{
+    if(curFilter==='missable'&&!i.missable)return;
+    if(curFilter!=='all'&&curFilter!=='missable'&&i.type!==curFilter)return;
+    if(search&&!i.name.toLowerCase().includes(search)&&!i.desc.toLowerCase().includes(search))return;
+    (groups[i.type]||groups.location).push(i);
+  });
+  let h='';
+  Object.entries(groups).forEach(([t,items])=>{
+    if(!items.length)return;
+    h+=`<div class="cg-title">${typeNames[t]||t}</div>`;
+    items.forEach(i=>{
+      const d=ck[i.id];
+      h+=`<div class="ci${d?' done':''}" onclick="tog('${i.id}','${a.id}')"><div class="ci-box">${d?'&#10003;':''}</div><div class="ci-info"><div class="ci-name">${i.name}${i.missable?'<span class="tag tag-missable">Manquable</span>':''}<span class="tag tag-${i.type}">${typeNames[i.type]||i.type}</span></div><div class="ci-desc">${i.desc}${i.location?' <b>('+i.location+')</b>':''}</div></div></div>`;
+    });
+  });
+  if(!h)h='<div style="padding:20px;color:var(--text-dim);text-align:center">Aucun element pour ce filtre.</div>';
+  c.innerHTML=h;
+}
+
+function tog(iid,aid){
+  ck[iid]=!ck[iid];save();
+  const a=A.find(x=>x.id===aid);
+  if(a){
+    renderCklist(a);
+    // Update panel stats
+    const total=a.items.length,done=a.items.filter(i=>ck[i.id]).length;
+    const miss=a.items.filter(i=>i.missable).length;
+    const pct=total>0?Math.round(done/total*100):0;
+    document.getElementById('apStats').innerHTML=`<div class="dstat"><span>${done}/${total}</span> fait</div>${miss?`<div class="dstat" style="color:var(--red)"><span>${miss}</span> manquable(s)</div>`:''}`;
+    document.getElementById('apBar').style.width=pct+'%';
+  }
+  updateProg();
+}
+
+// ============================= QUESTS =============================
+function renderQuests(){
+  const c=document.getElementById('qView');
+  let h='<h2 style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:14px;font-size:18px">Quetes de PNJ</h2>';
+  quests.forEach(q=>{
+    const total=q.steps.length,done=q.steps.filter((_,i)=>qk[q.id+'_'+i]).length;
+    h+=`<div class="qcard" id="q_${q.id}"><div class="qhead" onclick="togQ('${q.id}')"><div><div class="qname">${q.name}</div><div class="qmeta">${q.ending?`<span class="tag tag-fin">${q.ending}</span>`:''}${done}/${total}</div></div><span class="qarrow">&#9660;</span></div><div class="qsteps">`;
+    q.steps.forEach((s,i)=>{
+      const k=q.id+'_'+i,d=qk[k],an=A.find(a=>a.id===s.area)?.name||s.area;
+      h+=`<div class="qs${d?' done':''}" onclick="togQS('${k}')"><div class="qs-num">${d?'&#10003;':(i+1)}</div><div class="qs-info"><div class="qs-text">${s.text}</div><div class="qs-area">${an} ${s.missable?'<span class="tag tag-missable" style="font-size:8px">Manquable</span>':''}</div></div></div>`;
+    });
+    h+=`</div></div>`;
+  });
+  c.innerHTML=h;
+}
+function togQ(id){document.getElementById('q_'+id).classList.toggle('open')}
+function togQS(k){qk[k]=!qk[k];save();renderQuests();updateProg()}
+
+// ============================= ENDINGS =============================
+function renderEndings(){
+  const c=document.getElementById('eView');
+  let h='<h2 style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:14px;font-size:18px">Guide des Fins</h2>';
+  h+='<p style="color:var(--text-dim);margin-bottom:16px;font-size:12px;line-height:1.6">6 fins. Toutes sauf Flamme Frenetique en une partie. Sauvegarde avant boss final.</p>';
+  endings.forEach(e=>{
+    h+=`<div class="ecard"><div class="ename">${e.name}</div><div class="ereq">${e.req}</div>${e.warn?`<div class="ewarn">${e.warn}</div>`:''}</div>`;
+  });
+  c.innerHTML=h;
+}
+
+// ============================= VIEWS =============================
+function showView(v,el){
+  curView=v;
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  // Hide everything
+  document.getElementById('mapWrap').classList.add('hidden');
+  document.getElementById('areaView').classList.add('hidden');
+  document.getElementById('qView').className='qview';
+  document.getElementById('eView').className='eview';
+  document.getElementById('filterBar').style.display=v==='map'?'flex':'none';
+
+  if(v==='map'){
+    if(curArea){
+      document.getElementById('areaView').classList.remove('hidden');
+    } else {
+      document.getElementById('mapWrap').classList.remove('hidden');
+      renderMap();
+    }
+  } else if(v==='quests'){
+    document.getElementById('qView').className='qview active';
+    curArea=null;
+  } else if(v==='endings'){
+    document.getElementById('eView').className='eview active';
+    curArea=null;
+  }
+}
+
+document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');curFilter=b.dataset.f;applyFilters();
+}));
+function applyFilters(){if(curArea){const a=A.find(x=>x.id===curArea);if(a)renderCklist(a)}}
+
+function updateProg(){
+  let t=0,d=0;
+  A.forEach(a=>{t+=a.items.length;d+=a.items.filter(i=>ck[i.id]).length});
+  quests.forEach(q=>{t+=q.steps.length;d+=q.steps.filter((_,i)=>qk[q.id+'_'+i]).length});
+  const p=t>0?(d/t*100):0;
+  document.getElementById('totalProg').style.width=p+'%';
+  document.getElementById('totalText').textContent=`${d} / ${t} (${Math.round(p)}%)`;
+}
+
+// ============================= INIT =============================
+renderMap();renderQuests();renderEndings();updateProg();
+document.querySelector('.header h1').addEventListener('click',e=>{
+  if(e.shiftKey&&confirm('Remettre progression a zero ?')){ck={};qk={};save();location.reload()}
+});
+</script>
+</body>
+</html>
