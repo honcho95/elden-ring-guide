@@ -1,684 +1,410 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Elden Ring">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0a0a12">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%230a0a12' width='180' height='180' rx='36'/%3E%3Ccircle cx='90' cy='75' r='40' fill='none' stroke='%23c8a84e' stroke-width='3'/%3E%3Ctext x='90' y='155' text-anchor='middle' fill='%23c8a84e' font-size='18' font-family='serif'%3EELDEN RING%3C/text%3E%3C/svg%3E">
-<title>Elden Ring - Guide Complet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elden Ring - Interactive Checklist Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0a12;--bg2:#12121e;--bg3:#1a1a2e;--bg4:#22223a;--gold:#c8a84e;--gold-dim:#8a7235;--gold-bright:#e8c84e;--red:#c44040;--red-bg:rgba(196,64,64,.12);--green:#4caf50;--blue:#5c8dd6;--purple:#9c6dd6;--text:#d4d0c8;--text-dim:#888078;--text-bright:#f0ece4;--border:#2a2a3e}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;padding-top:env(safe-area-inset-top);-webkit-user-select:none;user-select:none}
-.header{background:linear-gradient(180deg,var(--bg2),var(--bg));border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:200;flex-wrap:wrap}
-.header h1{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);letter-spacing:2px;white-space:nowrap}
-.header-progress{flex:1;min-width:150px;max-width:280px}
-.progress-bar{background:var(--bg4);border-radius:10px;height:7px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-bright));border-radius:10px;transition:width .4s}
-.progress-text{font-size:11px;color:var(--text-dim);margin-top:2px}
-.nav{display:flex;gap:4px;margin-left:auto}
-.nav button{background:0;border:1px solid var(--border);color:var(--text-dim);padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
-.nav button:hover{border-color:var(--gold-dim);color:var(--text)}
-.nav button.active{background:var(--bg3);border-color:var(--gold);color:var(--gold)}
-.filters{padding:8px 20px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--bg);align-items:center}
-.fbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;border-radius:16px;font-size:11px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
-.fbtn:hover{border-color:var(--gold-dim)}
-.fbtn.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:500}
-.fbtn.miss.active{background:var(--red);border-color:var(--red);color:#fff}
-.search-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:16px;font-size:11px;outline:none;width:180px;font-family:'Inter',sans-serif;margin-left:auto}
-.search-input::placeholder{color:var(--text-dim)}.search-input:focus{border-color:var(--gold-dim)}
-.main{display:flex;height:calc(100vh - 88px)}.hidden{display:none!important}
-.map-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.map-tabs{display:flex;gap:5px;padding:12px 20px 0}
-.mtab{background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);padding:4px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
-.mtab:hover{border-color:var(--gold-dim)}.mtab.active{background:var(--bg4);border-color:var(--gold);color:var(--gold)}
-.map-container{flex:1;overflow:auto;margin:12px 20px 20px;border-radius:10px;border:1px solid var(--border);background:#080810;display:flex;align-items:center;justify-content:center}
-.map-container svg{width:100%;height:100%;max-height:calc(100vh - 180px)}
-.land{fill:#10101c;stroke:#1a1a2e;stroke-width:1}.conn{stroke:#252540;stroke-width:1.5;stroke-dasharray:6,4;fill:none}
-.region{cursor:pointer}.region .rbg{rx:8;ry:8;stroke:#2a2a44;stroke-width:1.5;transition:all .15s}
-.region:hover .rbg{stroke:#8a7235;stroke-width:2;filter:brightness(1.25)}
-.region.done .rbg{stroke:var(--green);stroke-width:2}
-.region .rlbl{font-family:'Cinzel',serif;font-size:10.5px;fill:var(--text-bright);text-anchor:middle;pointer-events:none}
-.region .rpct{font-family:'Inter',sans-serif;font-size:8px;fill:var(--gold);text-anchor:middle;pointer-events:none}
-.region .rpbar-bg{fill:#0a0a14;rx:2;ry:2}.region .rpbar{fill:var(--gold);rx:2;ry:2;transition:width .3s}
-.region.done .rpbar{fill:var(--green)}.miss-dot{fill:var(--red)}
-.erdtree-glow{fill:url(#erdtreeGrad);opacity:.5}.erdtree-trunk{stroke:var(--gold-dim);stroke-width:2;fill:none;opacity:.4}
-.floating-label{font-family:'Inter',sans-serif;font-size:8px;fill:var(--text-dim);text-anchor:middle;font-style:italic}
-
-/* AREA VIEW */
-.area-view{display:flex;height:calc(100vh - 88px);width:100%}
-.area-map-section{flex:1;position:relative;overflow:auto;background:#080810;min-width:0}
-.back-btn{position:absolute;top:14px;left:14px;background:rgba(10,10,18,.9);border:1px solid var(--border);color:var(--gold);padding:7px 16px;border-radius:8px;cursor:pointer;font-family:'Cinzel',serif;font-size:12px;z-index:10;transition:all .2s;display:flex;align-items:center;gap:6px}
-.back-btn:hover{border-color:var(--gold);background:rgba(26,26,46,.95)}
-.back-btn svg{width:14px;height:14px;fill:var(--gold)}
-.pin-wrap{position:relative;display:inline-block;min-width:100%;min-height:100%}
-.pin-wrap img{display:block;width:100%;min-width:650px;height:auto}
-.pin-wrap.no-img{display:flex;align-items:center;justify-content:center;min-height:400px;width:100%}
-.pin-wrap.no-img .fb{color:var(--text-dim);text-align:center;font-size:13px}
-
-/* MAP PINS */
-.pin{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:5;-webkit-tap-highlight-color:transparent}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,0,0,.7);box-shadow:0 0 4px rgba(0,0,0,.5);transition:all .15s}
-.pin:hover .pin-dot,.pin.active .pin-dot{transform:scale(1.6);z-index:6}
-.pin.ck .pin-dot{background:var(--green)!important;border-color:rgba(76,175,80,.6);opacity:.5}
-.pin-boss .pin-dot{background:#c44040}
-.pin-npc .pin-dot{background:#5c8dd6}
-.pin-item .pin-dot{background:#c8a84e}
-.pin-location .pin-dot{background:#9c6dd6}
-.pin-quest .pin-dot{background:#5c8dd6}
-.pin-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;background:rgba(10,10,18,.95);color:var(--text-bright);padding:3px 8px;border-radius:4px;border:1px solid var(--border);pointer-events:none;opacity:0;transition:opacity .15s;font-family:'Inter',sans-serif}
-.pin:hover .pin-tip,.pin.active .pin-tip{opacity:1}
-.pin-legend{position:absolute;bottom:14px;left:14px;background:rgba(10,10,18,.9);border:1px solid var(--border);border-radius:8px;padding:8px 12px;z-index:10;display:flex;gap:10px;font-size:10px;color:var(--text-dim);align-items:center}
-.pin-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle}
-
-.area-panel{width:400px;min-width:400px;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-.area-panel-head{padding:16px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:10}
-.area-panel-head h2{font-family:'Cinzel',serif;font-size:17px;color:var(--gold);margin-bottom:4px}
-.area-panel-head p{font-size:11px;color:var(--text-dim);line-height:1.5}
-.area-panel-stats{display:flex;gap:10px;margin-top:8px;font-size:11px}
-.dstat{background:var(--bg4);padding:3px 8px;border-radius:10px;color:var(--text-dim)}.dstat span{color:var(--text);font-weight:500}
-.area-panel-progress{margin-top:10px}.area-pbar{background:var(--bg4);border-radius:6px;height:6px;overflow:hidden}
-.area-pbar-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-bright));border-radius:6px;transition:width .3s}
-.checklist{padding:10px 18px 20px;flex:1}
-.cg-title{font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);margin:14px 0 6px;padding-bottom:3px;border-bottom:1px solid var(--border);letter-spacing:1px}
-.ci{display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border-radius:6px;transition:background .15s;cursor:pointer}
-.ci:hover,.ci.hl{background:var(--bg4)}.ci.done{opacity:.4}.ci.done .ci-name{text-decoration:line-through}
-.ci-box{width:16px;height:16px;min-width:16px;border:2px solid var(--border);border-radius:3px;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:10px}
-.ci.done .ci-box{background:var(--green);border-color:var(--green);color:#fff}
-.ci-info{flex:1;min-width:0}
-.ci-name{font-size:12px;color:var(--text-bright);font-weight:500;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.ci-desc{font-size:11px;color:var(--text-dim);margin-top:1px;line-height:1.45}
-.tag{font-size:8px;padding:1px 5px;border-radius:8px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
-.tag-boss{background:rgba(220,90,60,.2);color:#e07050}.tag-npc{background:rgba(92,141,214,.2);color:var(--blue)}
-.tag-item{background:rgba(200,168,78,.2);color:var(--gold)}.tag-location{background:rgba(156,109,214,.2);color:var(--purple)}
-.tag-quest{background:rgba(92,141,214,.12);color:var(--blue)}.tag-missable{background:var(--red-bg);color:var(--red);border:1px solid rgba(196,64,64,.3)}
-.tag-fin{background:rgba(76,175,80,.15);color:var(--green)}
-.qview{padding:20px;max-width:800px;margin:0 auto;display:none;overflow-y:auto;flex:1}.qview.active{display:block}
-.qcard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}.qcard:hover{border-color:var(--gold-dim)}
-.qhead{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.qname{font-family:'Cinzel',serif;font-size:14px;color:var(--text-bright)}
-.qmeta{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim)}
-.qarrow{transition:transform .2s;color:var(--text-dim);font-size:11px}.qcard.open .qarrow{transform:rotate(180deg)}
-.qsteps{display:none;padding:0 16px 12px}.qcard.open .qsteps{display:block}
-.qs{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--border);align-items:flex-start;cursor:pointer}
-.qs.done{opacity:.4}.qs.done .qs-text{text-decoration:line-through}
-.qs-num{width:20px;height:20px;min-width:20px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--text-dim)}
-.qs.done .qs-num{background:var(--green);border-color:var(--green);color:#fff}
-.qs-info{flex:1}.qs-text{font-size:12px;color:var(--text);line-height:1.5}.qs-area{font-size:10px;color:var(--text-dim);margin-top:2px}
-.eview{padding:20px;max-width:800px;margin:0 auto;display:none;overflow-y:auto;flex:1}.eview.active{display:block}
-.ecard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
-.ename{font-family:'Cinzel',serif;font-size:15px;color:var(--gold);margin-bottom:5px}
-.ereq{font-size:12px;color:var(--text);line-height:1.6}
-.ewarn{background:var(--red-bg);border:1px solid rgba(196,64,64,.25);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:11px;color:var(--red);line-height:1.5}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
-@media(max-width:900px){.main{flex-direction:column}.area-view{flex-direction:column}.area-panel{width:100%;min-width:unset;max-height:50vh;border-left:0;border-top:1px solid var(--border)}.area-map-section{min-height:35vh}.pin-wrap img{min-width:450px}}
+:root{--bg:#0a0a12;--sidebar:#111120;--card:#1a1a2e;--border:#2a2a40;--gold:#c8a951;--gold-dim:#8a6d2b;--gold-bright:#e8c960;--text:#e0d8c8;--text-dim:#8a8478;--text-muted:#5a5650}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+#app{display:flex;height:100vh;width:100vw}
+#sidebar{width:380px;min-width:380px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow:hidden}
+.sidebar-header{padding:20px 20px 12px;text-align:center;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-header h1{font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.sidebar-header h2{font-size:11px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;font-weight:400}
+.search-wrap{padding:12px 16px;flex-shrink:0}
+.search-wrap input{width:100%;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.search-wrap input:focus{border-color:var(--gold-dim)}.search-wrap input::placeholder{color:var(--text-muted)}
+.overall-progress{padding:4px 16px 12px;flex-shrink:0}
+.progress-bar{height:6px;background:var(--card);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:3px;transition:width .4s ease;width:0}
+.progress-text{font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between}
+.categories{flex:1;overflow-y:auto;padding:0 12px 12px}
+.categories::-webkit-scrollbar{width:6px}.categories::-webkit-scrollbar-track{background:transparent}.categories::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.cat-section{margin-bottom:6px}
+.cat-header{display:flex;align-items:center;padding:8px;cursor:pointer;border-radius:6px;transition:background .2s;user-select:none}
+.cat-header:hover{background:var(--card)}
+.cat-toggle{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);margin-right:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .2s}
+.cat-toggle.visible{border-color:var(--gold);background:var(--gold)}
+.cat-toggle.visible::after{content:'';display:block;width:8px;height:4px;border-left:2px solid var(--bg);border-bottom:2px solid var(--bg);transform:rotate(-45deg) translateY(-1px)}
+.cat-dot{width:10px;height:10px;border-radius:50%;margin-right:8px;flex-shrink:0}
+.cat-name{flex:1;font-size:13px;font-weight:500}
+.cat-count{font-size:11px;color:var(--text-dim);margin-left:8px}
+.cat-progress{font-size:10px;color:var(--gold-dim);margin-left:4px}
+.cat-expand{width:20px;text-align:center;color:var(--text-muted);font-size:14px;transition:transform .2s}
+.cat-expand.open{transform:rotate(90deg)}
+.cat-items{display:none;padding:2px 0 2px 36px;max-height:300px;overflow-y:auto}.cat-items.open{display:block}
+.cat-items::-webkit-scrollbar{width:4px}.cat-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.cat-item{display:flex;align-items:center;padding:5px 8px;border-radius:4px;cursor:pointer;transition:background .15s;font-size:12.5px}
+.cat-item:hover{background:rgba(200,169,81,.08)}
+.cat-item .check{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);margin-right:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cat-item.checked .check{border-color:var(--gold);background:var(--gold)}
+.cat-item.checked .check::after{content:'';display:block;width:7px;height:3.5px;border-left:1.5px solid var(--bg);border-bottom:1.5px solid var(--bg);transform:rotate(-45deg) translateY(-1px)}
+.cat-item.checked .item-name{text-decoration:line-through;color:var(--text-muted)}
+.item-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+.sidebar-footer button{flex:1;padding:6px;background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-size:11px;cursor:pointer;transition:all .2s}
+.sidebar-footer button:hover{border-color:var(--gold-dim);color:var(--text)}
+#map{flex:1;background:#08080f}
+.leaflet-container{background:#08080f!important}
+.leaflet-control-zoom a{background:var(--card)!important;color:var(--text)!important;border-color:var(--border)!important}
+.leaflet-control-zoom a:hover{background:var(--border)!important}
+.leaflet-popup-content-wrapper{background:var(--card)!important;color:var(--text)!important;border:1px solid var(--border);border-radius:8px!important;box-shadow:0 4px 20px rgba(0,0,0,.6)!important}
+.leaflet-popup-tip{background:var(--card)!important}
+.leaflet-popup-content{margin:12px 16px!important;font-size:13px;line-height:1.5}
+.popup-title{font-weight:600;font-size:14px;margin-bottom:2px;color:var(--gold)}
+.popup-cat{font-size:11px;color:var(--text-dim);margin-bottom:6px}
+.popup-desc{font-size:12px;color:var(--text-dim);margin-bottom:8px;max-width:250px}
+.popup-btn{display:inline-block;padding:5px 14px;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.popup-btn.mark{background:var(--gold);color:#000}.popup-btn.mark:hover{background:var(--gold-bright)}
+.popup-btn.unmark{background:var(--border);color:var(--text-dim)}.popup-btn.unmark:hover{background:#3a3a50}
+#toggle-sidebar{position:fixed;top:10px;left:10px;z-index:1001;background:var(--card);border:1px solid var(--border);color:var(--gold);width:36px;height:36px;border-radius:6px;cursor:pointer;font-size:18px;display:none;align-items:center;justify-content:center}
+@media(max-width:768px){#sidebar{position:fixed;left:-380px;transition:left .3s;z-index:1001;height:100%}#sidebar.open{left:0}#toggle-sidebar{display:flex}}
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px}
+.loading-overlay h1{font-family:Georgia,serif;font-size:28px;letter-spacing:8px;color:var(--gold);text-transform:uppercase}
+.loading-overlay p{color:var(--text-dim);font-size:13px}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div class="header">
-<h1>ELDEN RING</h1>
-<div class="header-progress"><div class="progress-bar"><div class="progress-fill" id="totalProg" style="width:0%"></div></div><div class="progress-text" id="totalText">0/0</div></div>
-<div class="nav"><button class="active" onclick="showView('map',this)">Carte</button><button onclick="showView('quests',this)">Quetes PNJ</button><button onclick="showView('endings',this)">Fins</button></div>
+<div class="loading-overlay" id="loading"><div class="spinner"></div><h1>Elden Ring</h1><p>Loading 3,131 markers...</p></div>
+<button id="toggle-sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+<div id="app">
+<div id="sidebar">
+  <div class="sidebar-header"><h1>Elden Ring</h1><h2>Interactive Checklist Map</h2></div>
+  <div class="search-wrap"><input type="text" id="search" placeholder="Search locations, bosses, items..."></div>
+  <div class="overall-progress"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="progress-text"><span id="progressText">0 / 0</span><span id="progressPct">0%</span></div></div>
+  <div class="categories" id="catBox"></div>
+  <div class="sidebar-footer">
+    <button onclick="resetProgress()">Reset Progress</button>
+    <button onclick="exportProgress()">Export</button>
+    <button onclick="importProgress()">Import</button>
+  </div>
 </div>
-<div class="filters" id="filterBar">
-<button class="fbtn active" data-f="all">Tout</button><button class="fbtn" data-f="boss">Boss</button><button class="fbtn" data-f="npc">PNJ</button><button class="fbtn" data-f="item">Objets</button><button class="fbtn" data-f="location">Lieux</button><button class="fbtn miss" data-f="missable">Manquable</button>
-<input type="text" class="search-input" placeholder="Rechercher..." id="searchIn" oninput="applyFilters()">
+<div id="map"></div>
 </div>
-<div class="main" id="mainContent">
-<div class="map-wrap" id="mapWrap">
-<div class="map-tabs"><button class="mtab active" onclick="showMap('overworld',this)">L'Entre-Terre</button><button class="mtab" onclick="showMap('underground',this)">Souterrains</button><button class="mtab" onclick="showMap('dlc',this)">Shadow of the Erdtree</button></div>
-<div class="map-container" id="mapCont"></div>
-</div>
-<div class="area-view hidden" id="areaView">
-<div class="area-map-section">
-<button class="back-btn" onclick="backToMap()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Carte</button>
-<div id="areaMapContent"></div>
-<div class="pin-legend" id="pinLegend"><span><span class="pin-legend-dot" style="background:#c44040"></span>Boss</span><span><span class="pin-legend-dot" style="background:#5c8dd6"></span>PNJ</span><span><span class="pin-legend-dot" style="background:#c8a84e"></span>Objet</span><span><span class="pin-legend-dot" style="background:var(--green)"></span>Fait</span></div>
-</div>
-<div class="area-panel">
-<div class="area-panel-head"><h2 id="apTitle"></h2><p id="apDesc"></p><div class="area-panel-stats" id="apStats"></div><div class="area-panel-progress"><div class="area-pbar"><div class="area-pbar-fill" id="apBar" style="width:0%"></div></div></div></div>
-<div class="checklist" id="cklist"></div>
-</div>
-</div>
-<div class="qview" id="qView"></div>
-<div class="eview" id="eView"></div>
-</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const fex='https://eldenring.wiki.fextralife.com/file/Elden-Ring/';
-const mapLayout={
-overworld:{viewBox:'0 0 960 740',land:'M 350 720 L 410 700 L 460 720 L 520 700 L 580 660 L 630 600 L 700 560 L 800 480 L 830 400 L 820 320 L 790 240 L 750 170 L 700 110 L 640 70 L 560 40 L 470 30 L 380 35 L 300 60 L 240 100 L 180 170 L 140 250 L 130 340 L 150 420 L 200 480 L 280 530 L 340 580 L 380 640 L 370 700 Z',erdtree:{x:530,y:185},connections:[['limgrave','weeping'],['limgrave','stormveil'],['limgrave','caelid'],['stormveil','liurnia'],['liurnia','academy'],['liurnia','altus'],['altus','gelmir'],['altus','leyndell'],['leyndell','mountaintops'],['mountaintops','snowfield'],['snowfield','haligtree'],['mountaintops','farum']]},
-underground:{viewBox:'0 0 800 520',land:null,erdtree:null,connections:[['siofra','nokron'],['nokron','ainsel'],['ainsel','lakerot'],['siofra','deeproot'],['mohgwyn','deeproot']]},
-dlc:{viewBox:'0 0 850 620',land:'M 120 580 L 180 560 L 300 550 L 420 570 L 550 560 L 680 530 L 760 490 L 790 400 L 770 300 L 730 220 L 660 150 L 560 80 L 450 40 L 340 50 L 250 90 L 180 160 L 140 260 L 120 370 L 110 480 Z',erdtree:null,connections:[['gravesite','ensis'],['gravesite','cerulean'],['gravesite','jagged'],['ensis','scadu'],['scadu','shadowkeep'],['scadu','rauh'],['scadu','abyssal'],['shadowkeep','enirilim'],['rauh','enirilim']]}
+// ═══════════ CONFIG ═══════════
+const CATEGORIES = {
+  'Site of Grace':      {color:'#f5c542',icon:'grace',    priority:1},
+  'Bosses':             {color:'#ff4444',icon:'boss',     priority:2},
+  'NPC':                {color:'#44bbff',icon:'dot',      priority:3},
+  'NPC Invader':        {color:'#ff6644',icon:'dot',      priority:4},
+  'Weapons':            {color:'#ff8844',icon:'dot',      priority:5},
+  'Shields':            {color:'#dd7733',icon:'dot',      priority:6},
+  'Armor':              {color:'#aa88cc',icon:'dot',      priority:7},
+  'Talismans':          {color:'#44ddaa',icon:'dot',      priority:8},
+  'Spells':             {color:'#8888ff',icon:'dot',      priority:9},
+  'Spirit Ashes':       {color:'#66ccff',icon:'dot',      priority:10},
+  'Ashes of War':       {color:'#bbbb44',icon:'dot',      priority:11},
+  'Flask Upgrades':     {color:'#ff66aa',icon:'dot',      priority:12},
+  'Key':                {color:'#dddddd',icon:'dot',      priority:13},
+  'Consumables':        {color:'#88aa66',icon:'dot',      priority:14},
+  'Materials':          {color:'#77aa77',icon:'dot',      priority:15},
+  'Upgrade Materials':  {color:'#ccaa55',icon:'dot',      priority:16},
+  'Locations':          {color:'#aaaaaa',icon:'dot',      priority:17},
+  'Summoning Pool':     {color:'#9988cc',icon:'dot',      priority:18},
+  'Waygates':           {color:'#44dddd',icon:'dot',      priority:19},
+  'Spiritsprings':      {color:'#66ee88',icon:'dot',      priority:20},
+  'Maps':               {color:'#ddcc88',icon:'dot',      priority:21},
+  'Remembrance':        {color:'#ffcc00',icon:'dot',      priority:22},
 };
 
-// bx/by = percentage position on area map image
-const A=[
-// =================== LIMGRAVE ===================
-{id:'limgrave',name:'Limgrave',map:'overworld',desc:'Region de depart.',sx:540,sy:510,color:'#2e4a28',
-img:fex+'limgrave_reg_map_elden_ring_wiki_guide_1920px.jpg',items:[
-// -- Boss --
-{id:'l07',name:'Sentinelle de l\'Arbre',type:'boss',desc:'Chevalier dore a cheval. Trop dur au debut.',location:'Devant Eglise Elleh',bx:28,by:35},
-{id:'l11',name:'Dragon Volant Agheel',type:'boss',desc:'Dragon au lac. Combat a Torrent.',location:'Lac Agheel',bx:48,by:50},
-{id:'l12',name:'Chevalier Creuset',type:'boss',desc:'Drop Aspects du Creuset: Queue.',location:'Geole Colline Orage',bx:20,by:22},
-{id:'l13',name:'Limier Darriwil',type:'boss',desc:'Blaidd invocable. Drop Croc du Limier.',location:'Geole Limier Perdu',bx:38,by:72},
-{id:'l18',name:'Marin Tibia',type:'boss',desc:'Boss squelette bateau. Drop Racine-Mort.',location:'Village Eaux Invocatrices',bx:60,by:18},
-{id:'lb1',name:'Cavalier de la Nuit',type:'boss',desc:'Apparait la NUIT sur le pont. Drop Cendre de Guerre.',location:'Pont pres Lac Agheel (nuit)',bx:42,by:48},
-{id:'lb2',name:'Avatar Arbre-Monde',type:'boss',desc:'Gardien arbre. Drop larmes physick.',location:'Arbre-Monde mineur',bx:70,by:42},
-{id:'lb3',name:'Tete Citrouille Folle',type:'boss',desc:'Sous-sol ruines. Debloquer Sellen.',location:'Ruines Point de Passage',bx:38,by:62},
-{id:'lb4',name:'Troll Tailleur de Pierre',type:'boss',desc:'Drop Smithing Stones.',location:'Tunnel de Limgrave',bx:55,by:55},
-{id:'lb5',name:'Chefs Demi-Humains',type:'boss',desc:'Deux chefs. Grotte cotiere.',location:'Grotte Cotiere',bx:10,by:58},
-{id:'lb6',name:'Assassin Couteau Noir',type:'boss',desc:'Drop Lame du Couteau Noir.',location:'Catacombes Touchees par la Mort',bx:58,by:25},
-{id:'lb7',name:'Duelliste Gardien Tombe',type:'boss',desc:'Catacombes Eaux Sombres.',location:'Catacombes Eaux Sombres',bx:44,by:32},
-{id:'lb8',name:'Bete de Farum Azula',type:'boss',desc:'Grotte du Talus.',location:'Grotte du Talus',bx:18,by:42},
-{id:'lb9',name:'Soldat de Godrick',type:'boss',desc:'Boss tutoriel. Facile.',location:'Cimetiere Echoue',bx:22,by:50},
-// -- NPC --
-{id:'l01',name:'Kale le Marchand',type:'npc',desc:'Kit Fabrication + torche.',location:'Eglise Elleh',bx:25,by:38},
-{id:'l02',name:'Varre au Masque Blanc',type:'npc',desc:'Premier PNJ. Se deplace ensuite.',location:'Grace Premier Pas',bx:30,by:42},
-{id:'l05',name:'Cloche Invocation',type:'item',missable:true,desc:'Eglise Elleh NUIT apres Torrent. Renna.',location:'Eglise Elleh (nuit)',bx:25,by:38},
-{id:'l08',name:'Boc le Couturier',type:'npc',missable:true,desc:'Buisson qui parle. Modifie vetements.',location:'Foret pres telescope',bx:50,by:40},
-{id:'l09',name:'Alexandre',type:'npc',desc:'Coince dans le sol. Frappe derriere.',location:'Colline Orage',bx:32,by:25},
-{id:'l10',name:'Blaidd',type:'npc',missable:true,desc:'Hurlement Bois Brumeux. Geste Claquer doigts.',location:'Ruines Bois Brumeux',bx:62,by:35},
-{id:'l14',name:'Patches',type:'npc',missable:true,desc:'ARRETE quand il se rend!',location:'Grotte Eaux Sombres',bx:42,by:28},
-{id:'l15',name:'Kenneth Haight',type:'npc',desc:'Reprendre Fort Haight.',location:'Ruines sud Bois Brumeux',bx:65,by:48},
-{id:'l16',name:'D, Chasseur Morts',type:'npc',desc:'Parle du Marin Tibia.',location:'Pres Village Eaux Invocatrices',bx:55,by:22},
-{id:'l17',name:'Roderika',type:'npc',missable:true,desc:'Parle AVANT Voilorage!',location:'Cabane Colline Orage',bx:28,by:28},
-// -- Item --
-{id:'l03',name:'Obtenir Torrent',type:'item',desc:'Grace Porte Chateau-fort. Melina.',location:'Grace Porte Chateau-fort',bx:35,by:30},
-{id:'l04',name:'Couteau a Aiguiser',type:'item',desc:'Coffre souterrain. Cendres de Guerre.',location:'Ruines Porte',bx:36,by:32},
-{id:'l06',name:'Fiole Merveilleux Physick',type:'item',desc:'Fiole essentielle.',location:'3e Eglise Marika',bx:68,by:28},
-{id:'l19',name:'Reduvia (Dague)',type:'item',desc:'Bat Nerijus. Arme saignement.',location:'Entree Catacombes Eaux Sombres',bx:43,by:30},
-]},
+// ═══════════ FEXTRALIFE TILE CONFIG ═══════════
+// Using the exact same tiles + CRS as the Fextralife wiki interactive map
+const TILE_URL = 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/map-50be4728-3907-4f33-8857-7f063e0d24eb/map-tiles.4/{z}/{x}/{y}.jpg';
 
-// =================== WEEPING PENINSULA ===================
-{id:'weeping',name:'Peninsule Lamentations',map:'overworld',desc:'Sud Limgrave. Bonne XP.',sx:450,sy:650,color:'#2a4422',
-img:fex+'weeping_peninsula_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'w03',name:'Belluaire Leonin',type:'boss',desc:'Drop Epee Greffee.',location:'Chateau Morne (plage)',bx:55,by:88},
-{id:'w04',name:'Avatar Arbre-Monde',type:'boss',desc:'Drop larmes physick.',location:'Arbre-Monde mineur',bx:42,by:42},
-{id:'w06',name:'Oiseau de Mort',type:'boss',desc:'NUIT uniquement.',location:'Approche Morne (nuit)',bx:50,by:72},
-{id:'wb1',name:'Cavalier de la Nuit',type:'boss',desc:'Sur le pont la nuit.',location:'Pont du Sacrifice (nuit)',bx:50,by:12},
-{id:'wb2',name:'Ours Runique',type:'boss',desc:'Grotte Matrice de Terre.',location:'Grotte Matrice de Terre',bx:62,by:32},
-{id:'wb3',name:'Ancien Hero Zamor',type:'boss',desc:'Catacombes Tombeguet.',location:'Catacombes Tombeguet',bx:38,by:28},
-{id:'wb4',name:'Miranda la Fleur Corrompue',type:'boss',desc:'Grotte Tombeguet.',location:'Grotte Tombeguet',bx:32,by:48},
-{id:'wb5',name:'Imberbe Ecailleux',type:'boss',desc:'Tunnel de Morne.',location:'Tunnel Morne',bx:58,by:58},
-{id:'w01',name:'Irina',type:'npc',missable:true,desc:'Lettre pour Edgar. Fin tragique.',location:'Pont Sacrifice (nord)',bx:50,by:10},
-{id:'w02',name:'Edgar',type:'npc',desc:'Pere Irina. Donne lettre.',location:'Remparts Morne',bx:52,by:82},
-{id:'w05',name:'Faux Ailee',type:'item',desc:'Excellente arme Foi.',location:'Ruines Tombeguet',bx:35,by:35},
-{id:'w07',name:'Tour du Retour',type:'location',desc:'Teleporte au Pont Divin Leyndell.',location:'Sud-est',bx:72,by:65},
-]},
+// ═══════════ STATE ═══════════
+let map, markersData = [], markerLayers = {}, catLayers = {};
+let checked = JSON.parse(localStorage.getItem('er-checked') || '{}');
+let catVisible = JSON.parse(localStorage.getItem('er-catvis') || '{}');
+let catOpen = {};
 
-// =================== STORMVEIL ===================
-{id:'stormveil',name:'Chateau Voilorage',map:'overworld',desc:'Premier donjon herite.',sx:420,sy:430,color:'#3a3a4a',
-img:fex+'stormveil_castle_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'s01',name:'Margit le Maudit Augure',type:'boss',desc:'Premier gros boss. Entraves Margit (Patches).',location:'Entree chateau',bx:75,by:80},
-{id:'s02',name:'Godrick le Greffe',type:'boss',desc:'Premier demi-dieu. Grande Rune.',location:'Salle du trone',bx:30,by:25},
-{id:'s08',name:'Esprit Arbre Ulcere',type:'boss',desc:'Boss cache sous-sol.',location:'Sous-sol (cave a vin)',bx:50,by:55},
-{id:'sb1',name:'Rejetons Greffes',type:'boss',desc:'Mini-boss recurrents dans le chateau.',location:'Divers dans le chateau',bx:45,by:45},
-{id:'s03',name:'Nepheli Loux',type:'npc',missable:true,desc:'Parle AVANT Godrick.',location:'Avant Cellule Reculee',bx:55,by:65},
-{id:'s04',name:'Rogier',type:'npc',missable:true,desc:'Balcon chapelle. Lie a Ranni.',location:'Balcon chapelle',bx:40,by:50},
-{id:'s05',name:'Gostoc',type:'npc',missable:true,desc:'Vole tes runes. NE LE TUE PAS.',location:'Porte chateau',bx:70,by:70},
-{id:'s06',name:'Grande Rune Godrick',type:'item',desc:'+5 toutes stats.',location:'Tour Divine Limgrave'},
-{id:'s07',name:'Lame Pierre Peche',type:'item',desc:'Affinites Lourd/Affute/Qualite.',location:'Salle Pierre Epee',bx:48,by:40},
-{id:'s09',name:'Memento Chrysalides',type:'item',missable:true,desc:'Pour Roderika.',location:'Pres Rejeton Greffe',bx:42,by:58},
-]},
+// ═══════════ INIT ═══════════
+fetch('markers.json')
+  .then(r => r.json())
+  .then(data => { markersData = data; init(); })
+  .catch(e => { document.getElementById('loading').innerHTML = '<h1>Error</h1><p>'+e.message+'</p>'; });
 
-// =================== LIURNIA ===================
-{id:'liurnia',name:'Liurnia des Lacs',map:'overworld',desc:'Vaste region lacustre.',sx:320,sy:340,color:'#1e3a5a',
-img:fex+'liurnia_of_the_lakes_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'li09',name:'Loretta (Manoir Caria)',type:'boss',desc:'Boss Manoir Caria.',location:'Manoir Caria',bx:22,by:15},
-{id:'lib1',name:'Dragon Smarag',type:'boss',desc:'Grand dragon dans le lac. Garde la cle.',location:'Ouest porte Academie',bx:38,by:40},
-{id:'lib2',name:'Avatar Arbre-Monde',type:'boss',desc:'Drop larmes physick.',location:'Arbre-Monde mineur sud',bx:52,by:58},
-{id:'lib3',name:'Omenkiller',type:'boss',desc:'Au Village Albinauriques.',location:'Village Albinauriques',bx:18,by:65},
-{id:'lib4',name:'Crystalien',type:'boss',desc:'Grotte Cristal Academie.',location:'Grotte Cristal Academie',bx:32,by:50},
-{id:'lib5',name:'Limier de Sang',type:'boss',desc:'Grotte Cristal Bord Lac.',location:'Grotte Cristal Bord Lac',bx:25,by:55},
-{id:'lib6',name:'Adan Voleur de Feu',type:'boss',desc:'Geole du Malfaiteur.',location:'Geole Malfaiteur',bx:42,by:62},
-{id:'lib7',name:'Bols, Chevalier Caria',type:'boss',desc:'Geole du Coucou.',location:'Geole Coucou',bx:20,by:32},
-{id:'lib8',name:'Marin Tibia',type:'boss',desc:'Deuxieme Marin Tibia.',location:'Est Liurnia',bx:58,by:35},
-{id:'lib9',name:'Cavalier de la Nuit',type:'boss',desc:'Sur la route la nuit.',location:'Route nord (nuit)',bx:35,by:25},
-{id:'li01',name:'Ranni la Sorciere',type:'npc',desc:'Mega-quete → Age des Etoiles.',location:'Tour Ranni (nord-ouest)',bx:18,by:12},
-{id:'li05',name:'Thops',type:'npc',missable:true,desc:'Veut Cle Glintstone extra.',location:'Eglise Irith',bx:48,by:52},
-{id:'li06',name:'Hyetta',type:'npc',missable:true,desc:'3 Raisins Shabriri → Flamme Frenetique.',location:'Falaises Face au Lac',bx:45,by:45},
-{id:'li07',name:'Varre (Eglise Rose)',type:'npc',desc:'Quete → Palais Mohgwyn.',location:'Eglise Rose',bx:28,by:58},
-{id:'li12',name:'Iji le Forgeron',type:'npc',desc:'Forgeron de Ranni.',location:'Route Manoir',bx:22,by:22},
-{id:'li08',name:'Cle Glintstone',type:'item',desc:'Ouvre Academie.',location:'Derriere Dragon Smarag',bx:36,by:42},
-{id:'li10',name:'Epee Nuit et Flamme',type:'item',desc:'Arme INT/FOI.',location:'Manoir Caria',bx:20,by:18},
-{id:'li03',name:'Village Albinauriques',type:'location',desc:'Medaillon Secret droite + Latenna.',location:'Sud-ouest sous falaise',bx:16,by:68},
-{id:'li02',name:'Salle Etude Caria',type:'location',desc:'Inversee quete Ranni.',location:'Est Liurnia',bx:58,by:48},
-]},
-
-// =================== ACADEMY ===================
-{id:'academy',name:'Academie Raya Lucaria',map:'overworld',desc:'Deuxieme donjon.',sx:410,sy:300,color:'#253a6a',
-img:fex+'academy_of_raya_lucaria_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'a01',name:'Loup Rouge Radagon',type:'boss',desc:'Mid-boss rapide.',location:'Parloir Debat',bx:45,by:50},
-{id:'a02',name:'Rennala',type:'boss',desc:'Boss principal. Phase 1+2.',location:'Grande Bibliotheque',bx:50,by:15},
-{id:'a03',name:'Rennala (Respec)',type:'npc',desc:'Larves Larvaires = redistribuer stats.',location:'Grande Bibliotheque',bx:52,by:18},
-{id:'a04',name:'Icone Radagon',type:'item',desc:'Reduit temps incantation.',location:'Parloir 2e etage',bx:48,by:45},
-{id:'a05',name:'Cle Glintstone extra',type:'item',missable:true,desc:'Pour Thops.',location:'Lustre Eglise Coucou',bx:55,by:60},
-]},
-
-// =================== CAELID ===================
-{id:'caelid',name:'Caelid & Dragonterrier',map:'overworld',desc:'Pourriture Ecarlate.',sx:730,sy:430,color:'#5a2a1a',
-img:fex+'caelid_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'c01',name:'Commandant O\'Neil',type:'boss',desc:'Drop Aiguille Or (Millicent).',location:'Marecage Aeonia',bx:30,by:48},
-{id:'c02',name:'Radahn',type:'boss',desc:'Festival massif. Ouvre Nokron.',location:'Chateau Criniere Rouge',bx:28,by:85},
-{id:'c06',name:'Greyoll Dragon Ancien',type:'boss',desc:'~80K runes. Enorme dragon endormi.',location:'Dragonterrier',bx:68,by:22},
-{id:'cb1',name:'Ekzykes le Putride',type:'boss',desc:'Dragon Pourriture Ecarlate.',location:'Sud Caelid, route',bx:22,by:55},
-{id:'cb2',name:'Avatar Arbre Putride',type:'boss',desc:'Version empoisonnee.',location:'Arbre-Monde mineur',bx:42,by:42},
-{id:'cb3',name:'Cavalier de la Nuit',type:'boss',desc:'Route la nuit.',location:'Route Caelid (nuit)',bx:30,by:65},
-{id:'cb4',name:'Oiseau du Rite Mortuaire',type:'boss',desc:'NUIT. Tres dur.',location:'Nord Caelid (nuit)',bx:55,by:38},
-{id:'cb5',name:'Bete Etoiles Filantes',type:'boss',desc:'Tunnel Cristal Sellia.',location:'Tunnel Cristal Sellia',bx:52,by:28},
-{id:'cb6',name:'Nox Spadassine & Pretre',type:'boss',desc:'Cachette de Sellia.',location:'Cachette Sellia',bx:48,by:32},
-{id:'cb7',name:'Duo Chevalier Pourriture',type:'boss',desc:'Grotte Abandonnee. Drop Scarabee Or (+20% runes)!',location:'Grotte Abandonnee',bx:38,by:58},
-{id:'c03',name:'Millicent',type:'npc',missable:true,desc:'Donne Aiguille Or. Quete critique.',location:'Eglise Peste',bx:40,by:35},
-{id:'c04',name:'Gurranq',type:'npc',desc:'9 Racines-Mort → incantations.',location:'Sanctuaire Bestial',bx:72,by:10},
-{id:'c09',name:'Gowry',type:'npc',desc:'Aide Millicent.',location:'Cabane Gowry',bx:45,by:38},
-{id:'c05',name:'Sellia Ville Sorcellerie',type:'location',desc:'3 braseros toits.',location:'Centre Caelid',bx:48,by:30},
-{id:'c07',name:'Fort Faroth',type:'location',desc:'Soreseal Radagon + Medaillon.',location:'Dragonterrier',bx:72,by:28},
-]},
-
-// =================== ALTUS ===================
-{id:'altus',name:'Plateau d\'Altus',map:'overworld',desc:'Via Ascenseur Dectus.',sx:380,sy:215,color:'#3a3a20',
-img:fex+'altus_plateau_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'alb1',name:'Vermiforme',type:'boss',desc:'NUIT. Arbre-Monde mineur. Drop larme physick.',location:'Arbre-Monde mineur (nuit)',bx:45,by:48},
-{id:'alb2',name:'Apotre Peau-de-Dieu',type:'boss',desc:'Village Moulin Dominiula.',location:'Dominiula',bx:55,by:18},
-{id:'alb3',name:'Duo Crystaliens',type:'boss',desc:'Tunnel Altus.',location:'Tunnel Altus',bx:30,by:55},
-{id:'alb4',name:'Chevalier Creuset (Epee)',type:'boss',desc:'Geole Evanescente.',location:'Geole Altus',bx:48,by:60},
-{id:'alb5',name:'Cavalier de la Nuit (duo)',type:'boss',desc:'NUIT. Deux cavaliers.',location:'Route Altus (nuit)',bx:40,by:42},
-{id:'alb6',name:'Sentinelle Draconique',type:'boss',desc:'Garde acces remparts exterieurs.',location:'Mur exterieur',bx:62,by:35},
-{id:'al03',name:'Masque d\'Or',type:'npc',missable:true,desc:'Pont casse. Fin Age Ordre.',location:'Pont Contemplation',bx:55,by:55},
-{id:'al04',name:'Frere Corhyn',type:'npc',desc:'Dis-lui ou est Masque Or.',location:'Jonction Grand-Route',bx:40,by:50},
-{id:'al01',name:'Grand Ascenseur Dectus',type:'location',desc:'2 moities Medaillon.',location:'Sud Altus',bx:42,by:75},
-{id:'al05',name:'Chateau Ombrage',type:'location',desc:'Prothese Valkyrie (Millicent).',location:'Nord Altus',bx:35,by:22},
-]},
-
-// =================== MT GELMIR ===================
-{id:'gelmir',name:'Mont Gelmir & Manoir Volcan',map:'overworld',desc:'Zone volcanique.',sx:195,sy:215,color:'#4a2a18',
-img:fex+'mt_gelmir_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'g04',name:'Rykard',type:'boss',desc:'UTILISE Chasseur Serpent a l\'entree!',location:'Profondeurs Manoir',bx:35,by:30},
-{id:'g06',name:'Bete Etoiles Adulte',type:'boss',desc:'Drop Machoire + Clochette Mineur.',location:'Sommet Mt Gelmir',bx:62,by:55},
-{id:'gb1',name:'Golem Magma',type:'boss',desc:'Grotte Golem.',location:'Grotte Golem',bx:55,by:68},
-{id:'gb2',name:'Roi Grafite de Sauvagerie',type:'boss',desc:'Tour des Yeux Dores.',location:'Tour Yeux Dores',bx:70,by:42},
-{id:'gb3',name:'Wyrm de Magma',type:'boss',desc:'Pres du lac de lave.',location:'Lac lave',bx:50,by:52},
-{id:'g01',name:'Manoir Volcan',type:'npc',missable:true,desc:'3 contrats avant Rykard.',location:'Manoir Volcan',bx:30,by:25},
-{id:'g07',name:'Comete Azur',type:'item',desc:'Sorcellerie legendaire.',location:'Pres Village Ermite',bx:58,by:48},
-{id:'g05',name:'Contrats Assassinat',type:'quest',missable:true,desc:'3 lettres. AVANT Rykard.',location:'Salon Manoir',bx:32,by:28},
-]},
-
-// =================== LEYNDELL ===================
-{id:'leyndell',name:'Leyndell, Capitale Royale',map:'overworld',desc:'Immense cite.',sx:540,sy:190,color:'#4a4420',
-img:fex+'leyndell_royal_capital_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'le01',name:'Sentinelle Draconique Arbre',type:'boss',desc:'Garde entree.',location:'Entree capitale',bx:70,by:75},
-{id:'le02',name:'Godfrey (Dore)',type:'boss',desc:'Fantome dore.',location:'Sanctuaire Arbre-Monde',bx:40,by:25},
-{id:'le03',name:'Morgott, Roi Augure',type:'boss',desc:'Boss principal. Grande Rune.',location:'Trone Elden',bx:45,by:20},
-{id:'le08',name:'Mohg l\'Augure',type:'boss',desc:'Dans egouts. Pas le vrai.',location:'Egouts profondeurs',bx:55,by:70},
-{id:'leb1',name:'Golem de l\'Arbre',type:'boss',desc:'Plusieurs dans la ville.',location:'Rues capitale',bx:50,by:45},
-{id:'leb2',name:'Duo Chevaliers Creuset',type:'boss',desc:'Souterrain. Epee + Bouclier.',location:'Souterrain Erdtree',bx:38,by:55},
-{id:'le04',name:'Eclair de Gransax',type:'item',missable:true,desc:'DEFINITIVEMENT MANQUABLE. Armement legendaire.',location:'Lance/dragon',bx:52,by:50},
-{id:'le05',name:'Egouts Souterrains',type:'location',missable:true,desc:'Devorant, Trois Doigts, Mohg.',location:'Puits capitale basse',bx:50,by:65},
-{id:'le06',name:'Devorant Souillures',type:'npc',missable:true,desc:'5 Maledictions Graine → sa fin.',location:'Egouts',bx:48,by:68},
-{id:'le07',name:'Les Trois Doigts',type:'location',missable:true,desc:'BLOQUE autres fins (reversible Aiguille).',location:'Fond egouts',bx:45,by:75},
-{id:'le09',name:'Masque Or Colisee',type:'npc',missable:true,desc:'Resultat Loi Regression.',location:'Pont Colisee',bx:65,by:35},
-]},
-
-// =================== MOUNTAINTOPS ===================
-{id:'mountaintops',name:'Cimes des Geants',map:'overworld',desc:'Zone enneigee endgame.',sx:680,sy:115,color:'#3a4454',
-img:fex+'mountaintops_of_the_giants_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'mt01',name:'Geant de Feu',type:'boss',desc:'Obligatoire. Apres = bruler Arbre.',location:'Forge des Geants',bx:65,by:18},
-{id:'mt04',name:'Commandant Niall',type:'boss',desc:'Invoque 2 chevaliers. Drop Medaillon.',location:'Chateau Sol',bx:72,by:35},
-{id:'mt05',name:'Borealis',type:'boss',desc:'Dragon de glace.',location:'Lac gele',bx:50,by:42},
-{id:'mtb1',name:'Oiseau Rite Mortuaire',type:'boss',desc:'NUIT. Pres des Ruines Zamor.',location:'Ruines Zamor (nuit)',bx:30,by:65},
-{id:'mtb2',name:'Erdtree Avatar',type:'boss',desc:'Drop larmes physick.',location:'Arbre-Monde mineur',bx:45,by:55},
-{id:'mtb3',name:'Esprit Arbre Ulcere',type:'boss',desc:'Tombe Hero Geant-Conquerant.',location:'Tombe Hero',bx:38,by:48},
-{id:'mt02',name:'Forge des Geants',type:'location',missable:true,desc:'Bruler Arbre = Leyndell change. Tout recuperer AVANT!',location:'Au-dela Geant de Feu'},
-{id:'mt03',name:'Chateau Sol',type:'location',desc:'Medaillon Secret Haligtree gauche.',location:'Nord-est',bx:70,by:30},
-]},
-
-// =================== SNOWFIELD ===================
-{id:'snowfield',name:'Champ Neige Consacre',map:'overworld',desc:'Zone cachee.',sx:560,sy:55,color:'#404a5a',
-img:fex+'consecrated_snowfield_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'snb1',name:'Duo Cavaliers Nuit',type:'boss',desc:'NUIT. Deux cavaliers. Drop Glaive Cavalier.',location:'Route Champ Neige (nuit)',bx:40,by:50},
-{id:'snb2',name:'Avatar Arbre Putride',type:'boss',desc:'Version empoisonnee.',location:'Arbre-Monde mineur',bx:30,by:40},
-{id:'snb3',name:'Grand Wyrm Theodorix',type:'boss',desc:'Wyrm de Magma geant.',location:'Nord Champ Neige',bx:55,by:25},
-{id:'sn02',name:'Ordina Liturgique',type:'location',desc:'4 bougies → Haligtree.',location:'Nord-est',bx:70,by:20},
-{id:'sn03',name:'Portail Mohgwyn',type:'location',desc:'Teleporteur Mohgwyn.',location:'Ouest',bx:18,by:55},
-{id:'sn04',name:'Fin quete Latenna',type:'npc',desc:'Geante Albinaurique.',location:'Apostate Derelict',bx:15,by:15},
-]},
-
-// =================== HALIGTREE ===================
-{id:'haligtree',name:'Haligtree de Miquella',map:'overworld',desc:'Malenia. Extremement dur.',sx:380,sy:45,color:'#3a3050',
-img:fex+'miquellas_haligtree_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'h01',name:'Loretta (Haligtree)',type:'boss',desc:'Version dure.',location:'Ville Haligtree',bx:45,by:30},
-{id:'h02',name:'Malenia, Lame Miquella',type:'boss',desc:'BOSS LE PLUS DUR. Se soigne. Phase 2 Pourriture.',location:'Racines',bx:50,by:85},
-{id:'hb1',name:'Avatar Arbre Putride',type:'boss',desc:'Version empoisonnee.',location:'Haligtree mid',bx:40,by:55},
-{id:'h03',name:'Millicent (Finale)',type:'npc',missable:true,desc:'AIDE-LA → Aiguille Miquella.',location:'Canal Drainage',bx:55,by:65},
-{id:'h04',name:'Aiguille Miquella',type:'item',missable:true,desc:'Farum Azula annule Flamme Frenetique.',location:'Recompense Millicent'},
-]},
-
-// =================== FARUM AZULA ===================
-{id:'farum',name:'Farum Azula Croulant',map:'overworld',desc:'Endgame obligatoire.',sx:840,sy:75,color:'#353545',
-img:fex+'crumbling_farum_azula_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'f01',name:'Duo Peaux-de-Dieu',type:'boss',desc:'Pots Sommeil pour endormir l\'un.',location:'Temple Dragon',bx:45,by:50},
-{id:'f02',name:'Seigneur Dragon Placidusax',type:'boss',desc:'Boss cache. S\'allonger. Arene Aiguille Miquella.',location:'Sous Grand Pont',bx:65,by:65},
-{id:'f03',name:'Maliketh, Lame Noire',type:'boss',desc:'Obligatoire. Gurranq → Maliketh.',location:'Au-dela Temple',bx:30,by:25},
-{id:'fb1',name:'Dragon Ancien Lansseax',type:'boss',desc:'Dragon foudre.',location:'Pres Grand Pont',bx:60,by:40},
-{id:'fb2',name:'Golem de l\'Arbre',type:'boss',desc:'Plusieurs sur le chemin.',location:'Farum Azula',bx:50,by:42},
-{id:'f04',name:'Invasion Bernahl',type:'npc',desc:'Si contrats faits. Sceptre Devoreur.',location:'Pres Grand Pont',bx:58,by:45},
-]},
-
-// =================== UNDERGROUND ===================
-{id:'siofra',name:'Riviere Siofra',map:'underground',desc:'Caverne etoilee.',sx:200,sy:280,color:'#1a2a4a',
-img:fex+'siofra_river_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'si01',name:'Esprit Ancestral',type:'boss',desc:'Allume 8 piliers.',location:'Corne Hallowe',bx:50,by:25},
-{id:'si03',name:'Soldat Draconique',type:'boss',desc:'Drop Lance Eclair Givree.',location:'Riviere Siofra',bx:35,by:55},
-{id:'sib1',name:'Gargoyle Ancetre',type:'boss',desc:'Gargouille de pierre.',location:'Aqueduc Siofra',bx:60,by:70},
-{id:'si02',name:'Blaidd (Quete Ranni)',type:'npc',desc:'Cherche Nokron.',location:'Rive Siofra',bx:40,by:45},
-]},
-{id:'nokron',name:'Nokron, Cite Eternelle',map:'underground',desc:'Apres Radahn. Quete Ranni.',sx:200,sy:110,color:'#1a2040',
-img:fex+'nokron_eternal_city_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'n01',name:'Larme Imitatrice',type:'boss',desc:'Copie ton perso.',location:'Nokron',bx:50,by:40},
-{id:'nob1',name:'Esprit Ancestral Regal',type:'boss',desc:'Version dure. Drop Souvenir.',location:'Nokron',bx:45,by:55},
-{id:'n02',name:'Cendres Larme Imitatrice',type:'item',desc:'MEILLEURE invocation.',location:'Apres boss',bx:55,by:35},
-{id:'n03',name:'Lame Tueuse Doigts',type:'item',desc:'Quete Ranni.',location:'Terre Sacree Nuit',bx:40,by:70},
-{id:'n04',name:'Lame Aiguiser Noire',type:'item',desc:'Affinites Poison/Sang/Occulte.',location:'Terre Sacree Nuit',bx:42,by:72},
-]},
-{id:'ainsel',name:'Riviere Ainsel',map:'underground',desc:'Quete Ranni.',sx:420,sy:190,color:'#1a2848',
-img:fex+'ainsel_river_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'aib1',name:'Soldat Draconique Nokstella',type:'boss',desc:'Drop Lance Eclair Givree.',location:'Ainsel Main',bx:40,by:50},
-{id:'ai01',name:'Ranni Miniature',type:'item',desc:'Parle-lui grace (x3).',location:'Ainsel Main',bx:35,by:40},
-{id:'ai03',name:'Lune Nokstella',type:'item',desc:'+2 memoire.',location:'Nokstella',bx:55,by:60},
-]},
-{id:'deeproot',name:'Profondeurs Racines',map:'underground',desc:'Via Aqueduc Siofra.',sx:420,sy:380,color:'#1a2830',
-img:fex+'deeproot_depths_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'d01',name:'Champions de Fia',type:'boss',desc:'Serie combats PNJ.',location:'Profondeurs',bx:50,by:50},
-{id:'d03',name:'Lichdragon Fortissax',type:'boss',desc:'Reve de Fia.',location:'Trone Prince Mort',bx:55,by:35},
-{id:'d02',name:'Fia',type:'npc',missable:true,desc:'Marque Maudite → Rune Reparation.',location:'Trone Prince Mort',bx:52,by:38},
-{id:'d04',name:'Armure Arbre Creuset',type:'item',desc:'Top armure lourde.',location:'Sur une racine',bx:35,by:60},
-]},
-{id:'lakerot',name:'Lac de Pourriture',map:'underground',desc:'Quete Ranni. Soins!',sx:600,sy:110,color:'#4a1a1a',
-img:fex+'lake_of_rot_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'lrb1',name:'Soldat Draconique',type:'boss',desc:'Boss dans le lac.',location:'Centre lac',bx:50,by:45},
-{id:'lr02',name:'Astel, Fille du Vide',type:'boss',desc:'Boss cle Ranni.',location:'Grand Cloitre',bx:45,by:80},
-{id:'lr03',name:'Dard Scorpion',type:'item',desc:'Dague Pourriture.',location:'Grand Cloitre',bx:50,by:78},
-]},
-{id:'mohgwyn',name:'Palais Mohgwyn',map:'underground',desc:'Via Varre ou Champ Neige.',sx:620,sy:320,color:'#4a1020',
-img:fex+'mohgwyn_dynasty_mausoleum_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'m01',name:'Mohg, Seigneur du Sang',type:'boss',desc:'Entraves + Larme Purificatrice.',location:'Trone Palais',bx:45,by:25},
-{id:'mob1',name:'Sanguine Noble',type:'boss',desc:'Invasion PNJ.',location:'Approche Palais',bx:40,by:55},
-{id:'m02',name:'Spot Farm Runes',type:'location',desc:'Albinauriques = enorme runes.',location:'Grace Approche Palais',bx:38,by:60},
-{id:'m03',name:'Talisman Exultation',type:'item',desc:'Boost attaque hemorragie.',location:'Mausolee',bx:50,by:35},
-{id:'m04',name:'Acces DLC',type:'location',desc:'Apres Mohg → cocon Miquella.',location:'Derriere arene',bx:48,by:20},
-]},
-
-// =================== DLC ===================
-{id:'gravesite',name:'Plaine du Cimetiere',map:'dlc',desc:'Depart DLC. Fragments CRITIQUES.',sx:420,sy:520,color:'#2a3828',
-img:fex+'gravesite_plain_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'gp05',name:'Bete Divine Lion Dansant',type:'boss',desc:'Premier boss DLC.',location:'Belurat',bx:65,by:25},
-{id:'gp03',name:'Golem Fournaise',type:'boss',desc:'Gros Pot Feu dans panier.',location:'Route principale',bx:40,by:45},
-{id:'gpb1',name:'Chevalier Feu',type:'boss',desc:'Plusieurs dans la zone.',location:'Gravesite',bx:35,by:55},
-{id:'gpb2',name:'Chef Demi-Humain',type:'boss',desc:'Camp demi-humain.',location:'Camp nord',bx:50,by:38},
-{id:'gp04',name:'Leda',type:'npc',desc:'PNJ cle DLC.',location:'Grace Croix Ruine',bx:40,by:50},
-{id:'gp07',name:'Hornsent',type:'npc',desc:'PNJ majeur. Quete embranchements.',location:'Plaine / Belurat',bx:55,by:35},
-{id:'gp01',name:'Fragments Scadutree',type:'item',desc:'CRITIQUE. Sans eux = 0 degats.',location:'Eglises, statues'},
-{id:'gp06',name:'Belurat',type:'location',desc:'Premier donjon herite DLC.',location:'Nord-est',bx:68,by:22},
-{id:'gp08',name:'Croix Miquella',type:'location',desc:'Croix dorees = histoire.',location:'Partout DLC'},
-]},
-{id:'ensis',name:'Chateau Ensis',map:'dlc',desc:'Bloque chemin Scadu.',sx:420,sy:400,color:'#2a2a4a',
-img:fex+'castle_ensis_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'en01',name:'Rellana, Double Lune',type:'boss',desc:'Deux epees magie + feu.',location:'Chateau Ensis',bx:50,by:25},
-{id:'enb1',name:'Moonrithyll',type:'boss',desc:'Dragon approche chateau.',location:'Approche chateau',bx:45,by:70},
-{id:'en02',name:'Sorcelleries Caria',type:'item',desc:'Plusieurs dans le chateau.',location:'Chateau',bx:48,by:40},
-]},
-{id:'scadu',name:'Scadu Altus',map:'dlc',desc:'Zone centrale DLC.',sx:420,sy:280,color:'#2a3020',
-img:fex+'scadu_altus_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'sc01',name:'Hippopotame Dore',type:'boss',desc:'Premier boss Forteresse.',location:'Entree Forteresse',bx:42,by:22},
-{id:'scb1',name:'Golem Fournaise',type:'boss',desc:'Version Scadu.',location:'Route Scadu',bx:35,by:45},
-{id:'scb2',name:'Chevalier Feu Ancien',type:'boss',desc:'Version renforcee.',location:'Eglise Scadu',bx:55,by:55},
-{id:'sc03',name:'Fragments Scadutree',type:'item',desc:'Eglises et croix.',location:'Eglises Scadu'},
-{id:'sc04',name:'Village Bonny',type:'location',desc:'PNJ + Bois Abyssaux.',location:'Est',bx:72,by:50},
-]},
-{id:'shadowkeep',name:'Forteresse Ombre',map:'dlc',desc:'Donjon majeur DLC.',sx:420,sy:160,color:'#2a2028',
-img:fex+'shadow_keep_location_map_elden_ring_wiki_guide_2560px.jpg',items:[
-{id:'sk01',name:'Messmer l\'Empaleur',type:'boss',desc:'Demi-dieu DLC. Lance feu.',location:'Chambre Obscure',bx:50,by:30},
-{id:'skb1',name:'Ombre du Peau-de-Dieu',type:'boss',desc:'Version ombre.',location:'Entrepot Specimens',bx:45,by:55},
-{id:'skb2',name:'Commandant Gaius',type:'boss',desc:'Chevalier a cheval lourd.',location:'Arriere Forteresse',bx:50,by:65},
-{id:'sk02',name:'Chevalier Feu Queelign',type:'npc',desc:'Allie/ennemi selon choix.',location:'Forteresse',bx:48,by:45},
-]},
-{id:'rauh',name:'Ruines Anciennes Rauh',map:'dlc',desc:'Ruines verdoyantes.',sx:210,sy:180,color:'#1a3020',items:[
-{id:'ra01',name:'Romina, Sainte Bourgeon',type:'boss',desc:'Garde chemin Enir-Ilim.',location:'Eglise Bourgeon',bx:50,by:30},
-{id:'rab1',name:'Lion Dansant (2e)',type:'boss',desc:'Deuxieme rencontre.',location:'Ruines Rauh',bx:40,by:55},
-]},
-{id:'abyssal',name:'Bois Abyssaux',map:'dlc',desc:'Horreur. Ennemis inguables. COURS.',sx:660,sy:300,color:'#1a1428',items:[
-{id:'ab01',name:'Midra, Seigneur Flamme',type:'boss',desc:'Boss tragique.',location:'Manoir Midra',bx:45,by:30},
-{id:'ab02',name:'Ennemis Folie',type:'location',desc:'INGUABLES. Course.',location:'Bois'},
-{id:'ab03',name:'Manoir Midra',type:'location',desc:'Donjon horreur.',location:'Fond Bois',bx:42,by:35},
-]},
-{id:'cerulean',name:'Cote Ceruleenne',map:'dlc',desc:'Zone cotiere cachee.',sx:160,sy:480,color:'#1a2a4a',items:[
-{id:'cc01',name:'Chevalier Putride',type:'boss',desc:'Spectral a cheval.',location:'Fissure Cercueil',bx:50,by:40},
-{id:'ccb1',name:'Dragon du Rivage',type:'boss',desc:'Dragon cotier.',location:'Cote',bx:40,by:60},
-]},
-{id:'jagged',name:'Pic Dentele',map:'dlc',desc:'Montagne dragons.',sx:700,sy:460,color:'#2a2a2a',items:[
-{id:'jp01',name:'Bayle le Terrible',type:'boss',desc:'Boss dragon ultime.',location:'Sommet',bx:50,by:15},
-{id:'jpb1',name:'Dragon Ancien Senessax',type:'boss',desc:'Dragon sur le chemin.',location:'Mi-chemin',bx:45,by:45},
-{id:'jpb2',name:'Jeune Dragon',type:'boss',desc:'Premier combat de dragon.',location:'Base pic',bx:50,by:75},
-{id:'jp02',name:'Igon',type:'npc',desc:'Invocable pour Bayle.',location:'Chemin',bx:48,by:55},
-]},
-{id:'enirilim',name:'Enir-Ilim',map:'dlc',desc:'Zone finale DLC.',sx:420,sy:50,color:'#2a2040',items:[
-{id:'ei01',name:'Leda & PNJ',type:'boss',missable:true,desc:'Selon tes choix.',location:'Approche',bx:50,by:60},
-{id:'ei02',name:'Radahn, Consort Miquella',type:'boss',desc:'Boss final DLC. 2 phases.',location:'Sommet',bx:50,by:20},
-{id:'ei03',name:'Fin DLC',type:'location',desc:'Ne bloque aucune fin jeu base.',location:'Apres boss'},
-]},
-];
-
-// ===================== QUESTS =====================
-const quests=[
-{id:'ranni',name:'Ranni la Sorciere',ending:'Age des Etoiles',steps:[
-{area:'liurnia',text:'Tour Ranni aux Trois Soeurs. Accepte de la servir.',missable:true},
-{area:'liurnia',text:'Parle a Blaidd, Iji, Seluvis.'},
-{area:'siofra',text:'Blaidd Riviere Siofra. Cherche Nokron.'},
-{area:'caelid',text:'Bat Radahn → ouvre Nokron.'},
-{area:'nokron',text:'Nokron → Lame Tueuse Doigts.'},
-{area:'liurnia',text:'Donne Lame a Ranni → Statue Inversee.'},
-{area:'liurnia',text:'Salle Etude → Tour Divine → Marque Maudite Mort.'},
-{area:'ainsel',text:'Portail Tour Ranni → Ainsel. Ranni Miniature (parle x3).'},
-{area:'ainsel',text:'Bat Ombre Maudite → Cle Palais.'},
-{area:'lakerot',text:'Lac Pourriture → cercueil → bat Astel.'},
-{area:'liurnia',text:'Autel Lunaire → Cathedrale Manus Celes. Anneau a Ranni.'},
-{area:'leyndell',text:'Apres boss final → signe Ranni (bleu).'},
-]},
-{id:'fia',name:'Fia',ending:'Age du Crepuscule',steps:[
-{area:'leyndell',text:'Table Ronde. Etreinte Fia.'},
-{area:'leyndell',text:'Dague Abimee a Fia.',missable:true},
-{area:'leyndell',text:'D mort. Armure Jumelee.'},
-{area:'deeproot',text:'Profondeurs. Bat Champions Fia.'},
-{area:'deeproot',text:'Marque Maudite Mort a Fia.',missable:true},
-{area:'deeproot',text:'Reve → Lichdragon Fortissax.'},
-{area:'deeproot',text:'Rune Reparation Prince Mort.'},
-]},
-{id:'goldmask',name:'Masque d\'Or & Corhyn',ending:'Age de l\'Ordre',steps:[
-{area:'altus',text:'Corhyn Altus. Masque Or pont casse.',missable:true},
-{area:'altus',text:'Dis a Corhyn.'},
-{area:'leyndell',text:'Masque Or Colisee. Loi Regression (37 INT).',missable:true},
-{area:'leyndell',text:'Radagon est Marika.'},
-{area:'leyndell',text:'Apres brule Arbre → Leyndell Cendres.',missable:true},
-{area:'leyndell',text:'Rune Ordre Parfait.'},
-]},
-{id:'dungeater',name:'Devorant Souillures',ending:'Benediction Desespoir',steps:[
-{area:'leyndell',text:'Message Table Ronde.'},
-{area:'leyndell',text:'Cle Geoles. Trouve-le.'},
-{area:'leyndell',text:'5 Maledictions en Graine.',missable:true},
-{area:'leyndell',text:'Nourris 5 → Rune Malediction.'},
-]},
-{id:'millicent',name:'Millicent',ending:null,steps:[
-{area:'caelid',text:'Bat O\'Neil → Aiguille Or.'},
-{area:'caelid',text:'Cabane Gowry.'},
-{area:'caelid',text:'Donne Aiguille Eglise Peste.',missable:true},
-{area:'altus',text:'Millicent Altus. Prothese Valkyrie.',missable:true},
-{area:'mountaintops',text:'Millicent Cimes.'},
-{area:'haligtree',text:'Haligtree: AIDE-LA.',missable:true},
-{area:'haligtree',text:'Aiguille fleur Malenia → Aiguille Miquella → Farum.',missable:true},
-]},
-{id:'alexander',name:'Alexandre',ending:null,steps:[
-{area:'limgrave',text:'Libere du sol.'},
-{area:'caelid',text:'Festival Radahn.'},
-{area:'liurnia',text:'Coince Cabane Artiste. Pot Huile.',missable:true},
-{area:'gelmir',text:'Terminus Eaux Bouillantes.'},
-{area:'farum',text:'Duel Farum → Eclat Alexandre.',missable:true},
-]},
-{id:'varre',name:'Varre',ending:null,steps:[
-{area:'limgrave',text:'"Sans-damoiselle".'},
-{area:'liurnia',text:'Eglise Rose. Envahis x3.'},
-{area:'liurnia',text:'Faveur Seigneur Sang. Trempe sang.'},
-{area:'liurnia',text:'Medal → teleport Mohgwyn.'},
-]},
-];
-
-const endings=[
-{name:'Seigneur Elden (Defaut)',req:'Bat Radagon/Bete Elden. Repare Elden Ring.'},
-{name:'Age des Etoiles (Ranni)',req:'Complete quete Ranni. Signe bleu apres boss final.'},
-{name:'Age du Crepuscule (Fia)',req:'Rune Prince Mort via quete Fia.'},
-{name:'Age de l\'Ordre (Masque Or)',req:'Rune Ordre Parfait. 37 INT.'},
-{name:'Benediction Desespoir',req:'Rune Malediction Infame. 5 Maledictions.'},
-{name:'Seigneur Flamme Frenetique',req:'Trois Doigts fond Egouts. Retire armure.',warn:'BLOQUE TOUTES FINS. Annuler: Aiguille Miquella (Millicent) arene Placidusax Farum.'},
-];
-
-// ===================== STATE =====================
-let ck=JSON.parse(localStorage.getItem('er5_ck')||'{}');
-let qk=JSON.parse(localStorage.getItem('er5_qk')||'{}');
-let curArea=null,curView='map',curMap='overworld',curFilter='all',hlPin=null;
-function save(){localStorage.setItem('er5_ck',JSON.stringify(ck));localStorage.setItem('er5_qk',JSON.stringify(qk))}
-
-// ===================== WORLD MAP =====================
-function showMap(id,el){curMap=id;document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');renderMap()}
-function renderMap(){
-const ml=mapLayout[curMap],areas=A.filter(a=>a.map===curMap),rw=140,rh=44;
-let s=`<svg viewBox="${ml.viewBox}" xmlns="http://www.w3.org/2000/svg" style="font-family:Inter,sans-serif"><defs><radialGradient id="erdtreeGrad"><stop offset="0%" stop-color="#c8a84e" stop-opacity=".3"/><stop offset="100%" stop-color="#c8a84e" stop-opacity="0"/></radialGradient></defs>`;
-if(ml.land)s+=`<path class="land" d="${ml.land}" opacity=".6"/>`;
-if(ml.erdtree){const e=ml.erdtree;s+=`<circle class="erdtree-glow" cx="${e.x}" cy="${e.y-10}" r="60"/><line class="erdtree-trunk" x1="${e.x}" y1="${e.y+15}" x2="${e.x}" y2="${e.y-40}"/><line class="erdtree-trunk" x1="${e.x}" y1="${e.y-20}" x2="${e.x-15}" y2="${e.y-35}"/><line class="erdtree-trunk" x1="${e.x}" y1="${e.y-20}" x2="${e.x+15}" y2="${e.y-35}"/>`}
-ml.connections.forEach(([f,t])=>{const a1=A.find(a=>a.id===f),a2=A.find(a=>a.id===t);if(a1&&a2)s+=`<line class="conn" x1="${a1.sx}" y1="${a1.sy}" x2="${a2.sx}" y2="${a2.sy}"/>`});
-areas.forEach(a=>{const total=a.items.length,done=a.items.filter(i=>ck[i.id]).length,pct=total>0?Math.round(done/total*100):0,x=a.sx-rw/2,y=a.sy-rh/2,pbw=rw-20,hasMiss=a.items.some(i=>i.missable&&!ck[i.id]);
-s+=`<g class="region${pct===100?' done':''}" onclick="selectArea('${a.id}')"><rect class="rbg" x="${x}" y="${y}" width="${rw}" height="${rh}" fill="${a.color||'#1a1a2e'}"/><text class="rlbl" x="${a.sx}" y="${a.sy-2}">${a.name}</text><rect class="rpbar-bg" x="${x+10}" y="${a.sy+10}" width="${pbw}" height="4"/><rect class="rpbar" x="${x+10}" y="${a.sy+10}" width="${pbw*pct/100}" height="4"/><text class="rpct" x="${a.sx}" y="${a.sy+24}">${pct}%</text>${hasMiss?`<circle class="miss-dot" cx="${x+rw-6}" cy="${y+6}" r="4"/>`:''}</g>`});
-if(curMap==='overworld')s+=`<text class="floating-label" x="840" y="50">(flottant)</text>`;
-s+=`</svg>`;document.getElementById('mapCont').innerHTML=s}
-
-// ===================== AREA VIEW =====================
-function selectArea(id){
-curArea=id;const a=A.find(x=>x.id===id);if(!a)return;
-document.getElementById('mapWrap').classList.add('hidden');
-document.getElementById('areaView').classList.remove('hidden');
-document.getElementById('apTitle').textContent=a.name;
-document.getElementById('apDesc').textContent=a.desc;
-updAreaStats(a);
-renderAreaMap(a);
-renderCklist(a);
-}
-
-function renderAreaMap(a){
-const mc=document.getElementById('areaMapContent');
-const pins=a.items.filter(i=>i.bx!==undefined);
-let h='<div class="pin-wrap'+(a.img?'':' no-img')+'">';
-if(a.img){
-  h+=`<img src="${a.img}" alt="${a.name}" onerror="this.style.display='none'">`;
-  pins.forEach(i=>{
-    const done=ck[i.id];
-    h+=`<div class="pin pin-${i.type}${done?' ck':''}" style="left:${i.bx}%;top:${i.by}%" onclick="togFromPin('${i.id}','${a.id}')" onmouseenter="hlItem('${i.id}')" onmouseleave="unhlItem('${i.id}')"><div class="pin-dot"></div><div class="pin-tip">${i.name}</div></div>`;
+function init() {
+  // Exact same Leaflet config as Fextralife wiki — CRS.Simple, same tiles
+  map = L.map('map', {
+    crs: L.CRS.Simple,
+    zoomSnap: 0.25,
+    attributionControl: false,
+    center: [0, 0],
+    zoom: 2,
   });
-} else {
-  h+=`<div class="fb"><b>${a.name}</b><br>Pas de carte. Checklist a droite →</div>`;
-}
-h+='</div>';mc.innerHTML=h;
-}
+  map.options.minZoom = 2;
+  map.options.maxZoom = 7;
 
-function togFromPin(iid,aid){
-ck[iid]=!ck[iid];save();
-const a=A.find(x=>x.id===aid);if(!a)return;
-renderAreaMap(a);renderCklist(a);updAreaStats(a);updateProg();
-}
+  L.tileLayer(TILE_URL, {minZoom:0, maxZoom:7, continuousWorld:false, noWrap:true, crs: L.CRS.Simple}).addTo(map);
+  var mapSW = [0, 35000], mapNE = [35000, 0];
+  map.setMaxBounds(new L.LatLngBounds(map.unproject(mapSW, map.getMaxZoom()), map.unproject(mapNE, map.getMaxZoom())));
 
-function hlItem(iid){
-const el=document.getElementById('ci_'+iid);
-if(el){el.classList.add('hl');el.scrollIntoView({behavior:'smooth',block:'nearest'})}
-}
-function unhlItem(iid){
-const el=document.getElementById('ci_'+iid);if(el)el.classList.remove('hl');
-}
-
-function updAreaStats(a){
-const total=a.items.length,done=a.items.filter(i=>ck[i.id]).length,miss=a.items.filter(i=>i.missable).length,pct=total>0?Math.round(done/total*100):0;
-document.getElementById('apStats').innerHTML=`<div class="dstat"><span>${done}/${total}</span> fait</div>${miss?`<div class="dstat" style="color:var(--red)"><span>${miss}</span> manquable</div>`:''}`;
-document.getElementById('apBar').style.width=pct+'%';
-}
-
-function backToMap(){curArea=null;document.getElementById('areaView').classList.add('hidden');document.getElementById('mapWrap').classList.remove('hidden');renderMap()}
-
-// ===================== CHECKLIST =====================
-const typeNames={boss:'Boss',npc:'PNJ',item:'Objets',location:'Lieux',quest:'Quetes'};
-function renderCklist(a){
-const c=document.getElementById('cklist'),search=document.getElementById('searchIn').value.toLowerCase();
-const groups={boss:[],npc:[],item:[],location:[],quest:[]};
-a.items.forEach(i=>{
-  if(curFilter==='missable'&&!i.missable)return;
-  if(curFilter!=='all'&&curFilter!=='missable'&&i.type!==curFilter)return;
-  if(search&&!i.name.toLowerCase().includes(search)&&!(i.desc||'').toLowerCase().includes(search))return;
-  (groups[i.type]||groups.location).push(i);
-});
-let h='';
-Object.entries(groups).forEach(([t,items])=>{
-  if(!items.length)return;
-  h+=`<div class="cg-title">${typeNames[t]||t}</div>`;
-  items.forEach(i=>{const d=ck[i.id];
-    h+=`<div class="ci${d?' done':''}" id="ci_${i.id}" onclick="tog('${i.id}','${a.id}')" onmouseenter="hlPin_('${i.id}')" onmouseleave="unhlPin_('${i.id}')"><div class="ci-box">${d?'&#10003;':''}</div><div class="ci-info"><div class="ci-name">${i.name}${i.missable?'<span class="tag tag-missable">Manquable</span>':''}<span class="tag tag-${i.type}">${typeNames[i.type]||i.type}</span></div><div class="ci-desc">${i.desc||''}${i.location?' <b>('+i.location+')</b>':''}</div></div></div>`;
+  // Create category layer groups
+  Object.keys(CATEGORIES).forEach(cat => {
+    catLayers[cat] = L.layerGroup();
+    if (catVisible[cat] !== false) catLayers[cat].addTo(map);
   });
-});
-if(!h)h='<div style="padding:20px;color:var(--text-dim);text-align:center">Aucun element.</div>';
-c.innerHTML=h;
+
+  // Create markers
+  markersData.forEach((item, idx) => {
+    // Fextralife x = lat, y = lng — use directly in CRS.Simple
+    const lat = item.x;
+    const lng = item.y;
+
+    const cat = CATEGORIES[item.c] || {color:'#888',icon:'dot'};
+    const isChecked = !!checked[idx];
+    const size = item.c === 'Bosses' ? 10 : item.c === 'Site of Grace' ? 8 : 6;
+
+    const marker = L.circleMarker([lat, lng], {
+      radius: size,
+      fillColor: cat.color,
+      color: isChecked ? '#333' : cat.color,
+      weight: isChecked ? 1 : 2,
+      opacity: isChecked ? 0.3 : 0.9,
+      fillOpacity: isChecked ? 0.15 : 0.7,
+    });
+
+    marker.bindPopup(() => createPopup(idx, item), {maxWidth:280});
+    marker.on('click', () => map.setView([lat, lng]));
+    marker._erIdx = idx;
+    marker._erCat = item.c;
+
+    if (catLayers[item.c]) marker.addTo(catLayers[item.c]);
+    markerLayers[idx] = marker;
+  });
+
+  buildSidebar();
+  updateProgress();
+  document.getElementById('loading').style.display = 'none';
+
+  // Search
+  document.getElementById('search').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase().trim();
+    filterSidebar(q);
+  });
 }
 
-function hlPin_(iid){document.querySelectorAll('.pin').forEach(p=>{if(p.onclick&&p.onclick.toString().includes(iid))p.classList.add('active')})}
-function unhlPin_(iid){document.querySelectorAll('.pin.active').forEach(p=>p.classList.remove('active'))}
-
-function tog(iid,aid){
-ck[iid]=!ck[iid];save();
-const a=A.find(x=>x.id===aid);if(!a)return;
-renderCklist(a);renderAreaMap(a);updAreaStats(a);updateProg();
+// ═══════════ POPUP ═══════════
+function createPopup(idx, item) {
+  const isChecked = !!checked[idx];
+  const cat = CATEGORIES[item.c] || {color:'#888'};
+  return `<div>
+    <div class="popup-title">${item.n}</div>
+    <div class="popup-cat" style="color:${cat.color}">${item.c}</div>
+    ${item.d ? '<div class="popup-desc">'+item.d+'</div>' : ''}
+    <button class="popup-btn ${isChecked ? 'unmark' : 'mark'}" onclick="toggleCheck(${idx})">${isChecked ? 'Unmark' : 'Mark Complete'}</button>
+  </div>`;
 }
 
-// ===================== QUESTS =====================
-function renderQuests(){
-const c=document.getElementById('qView');let h='<h2 style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:14px;font-size:18px">Quetes PNJ</h2>';
-quests.forEach(q=>{const total=q.steps.length,done=q.steps.filter((_,i)=>qk[q.id+'_'+i]).length;
-h+=`<div class="qcard" id="q_${q.id}"><div class="qhead" onclick="togQ('${q.id}')"><div><div class="qname">${q.name}</div><div class="qmeta">${q.ending?`<span class="tag tag-fin">${q.ending}</span>`:''}${done}/${total}</div></div><span class="qarrow">&#9660;</span></div><div class="qsteps">`;
-q.steps.forEach((s,i)=>{const k=q.id+'_'+i,d=qk[k],an=A.find(a=>a.id===s.area)?.name||s.area;
-h+=`<div class="qs${d?' done':''}" onclick="togQS('${k}')"><div class="qs-num">${d?'&#10003;':(i+1)}</div><div class="qs-info"><div class="qs-text">${s.text}</div><div class="qs-area">${an} ${s.missable?'<span class="tag tag-missable" style="font-size:8px">Manquable</span>':''}</div></div></div>`});
-h+=`</div></div>`});c.innerHTML=h}
-function togQ(id){document.getElementById('q_'+id).classList.toggle('open')}
-function togQS(k){qk[k]=!qk[k];save();renderQuests();updateProg()}
-
-// ===================== ENDINGS =====================
-function renderEndings(){
-const c=document.getElementById('eView');let h='<h2 style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:14px;font-size:18px">Fins</h2><p style="color:var(--text-dim);margin-bottom:16px;font-size:12px">6 fins. Toutes sauf Flamme Frenetique en 1 partie. Save avant boss final.</p>';
-endings.forEach(e=>{h+=`<div class="ecard"><div class="ename">${e.name}</div><div class="ereq">${e.req}</div>${e.warn?`<div class="ewarn">${e.warn}</div>`:''}</div>`});c.innerHTML=h}
-
-// ===================== VIEWS =====================
-function showView(v,el){
-curView=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');
-document.getElementById('mapWrap').classList.add('hidden');document.getElementById('areaView').classList.add('hidden');
-document.getElementById('qView').className='qview';document.getElementById('eView').className='eview';
-document.getElementById('filterBar').style.display=v==='map'?'flex':'none';
-if(v==='map'){if(curArea)document.getElementById('areaView').classList.remove('hidden');else{document.getElementById('mapWrap').classList.remove('hidden');renderMap()}}
-else if(v==='quests'){document.getElementById('qView').className='qview active';curArea=null}
-else{document.getElementById('eView').className='eview active';curArea=null}
+// ═══════════ CHECK/UNCHECK ═══════════
+function toggleCheck(idx) {
+  checked[idx] = !checked[idx];
+  saveChecked();
+  updateMarkerStyle(idx);
+  updateSidebarItem(idx);
+  updateProgress();
+  // Refresh popup
+  const m = markerLayers[idx];
+  if (m && m.isPopupOpen()) {
+    m.closePopup();
+    m.openPopup();
+  }
 }
-document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');curFilter=b.dataset.f;applyFilters()}));
-function applyFilters(){if(curArea){const a=A.find(x=>x.id===curArea);if(a)renderCklist(a)}}
-function updateProg(){let t=0,d=0;A.forEach(a=>{t+=a.items.length;d+=a.items.filter(i=>ck[i.id]).length});quests.forEach(q=>{t+=q.steps.length;d+=q.steps.filter((_,i)=>qk[q.id+'_'+i]).length});const p=t>0?(d/t*100):0;document.getElementById('totalProg').style.width=p+'%';document.getElementById('totalText').textContent=`${d}/${t} (${Math.round(p)}%)`}
 
-// ===================== INIT =====================
-renderMap();renderQuests();renderEndings();updateProg();
-document.querySelector('.header h1').addEventListener('click',e=>{if(e.shiftKey&&confirm('Reset progression?')){ck={};qk={};save();location.reload()}});
+function updateMarkerStyle(idx) {
+  const m = markerLayers[idx];
+  if (!m) return;
+  const isChecked = !!checked[idx];
+  const cat = CATEGORIES[markersData[idx].c] || {color:'#888'};
+  m.setStyle({
+    color: isChecked ? '#333' : cat.color,
+    weight: isChecked ? 1 : 2,
+    opacity: isChecked ? 0.3 : 0.9,
+    fillOpacity: isChecked ? 0.15 : 0.7,
+  });
+}
+
+function saveChecked() { localStorage.setItem('er-checked', JSON.stringify(checked)); }
+function saveCatVis() { localStorage.setItem('er-catvis', JSON.stringify(catVisible)); }
+
+// ═══════════ SIDEBAR ═══════════
+function buildSidebar() {
+  const box = document.getElementById('catBox');
+  box.innerHTML = '';
+
+  // Group items by category
+  const groups = {};
+  markersData.forEach((item, idx) => {
+    if (!groups[item.c]) groups[item.c] = [];
+    groups[item.c].push({...item, idx});
+  });
+
+  // Sort categories by priority
+  const sortedCats = Object.keys(groups).sort((a, b) =>
+    (CATEGORIES[a]?.priority || 99) - (CATEGORIES[b]?.priority || 99)
+  );
+
+  sortedCats.forEach(cat => {
+    const items = groups[cat].sort((a, b) => a.n.localeCompare(b.n));
+    const catConf = CATEGORIES[cat] || {color:'#888'};
+    const isVis = catVisible[cat] !== false;
+    const checkedCount = items.filter(i => checked[i.idx]).length;
+
+    const section = document.createElement('div');
+    section.className = 'cat-section';
+    section.dataset.cat = cat;
+
+    section.innerHTML = `
+      <div class="cat-header" onclick="toggleCatOpen('${cat}')">
+        <div class="cat-toggle ${isVis ? 'visible' : ''}" onclick="event.stopPropagation();toggleCatVis('${cat}')"></div>
+        <div class="cat-dot" style="background:${catConf.color}"></div>
+        <span class="cat-name">${cat}</span>
+        <span class="cat-progress">${checkedCount}/${items.length}</span>
+        <span class="cat-expand ${catOpen[cat] ? 'open' : ''}">&#9654;</span>
+      </div>
+      <div class="cat-items ${catOpen[cat] ? 'open' : ''}" data-cat-items="${cat}">
+        ${items.map(item => `
+          <div class="cat-item ${checked[item.idx] ? 'checked' : ''}" data-idx="${item.idx}" onclick="flyToItem(${item.idx})">
+            <div class="check" onclick="event.stopPropagation();toggleCheck(${item.idx})"></div>
+            <span class="item-name">${item.n}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    box.appendChild(section);
+  });
+}
+
+function toggleCatOpen(cat) {
+  catOpen[cat] = !catOpen[cat];
+  const section = document.querySelector(`.cat-section[data-cat="${cat}"]`);
+  if (!section) return;
+  section.querySelector('.cat-expand').classList.toggle('open', catOpen[cat]);
+  section.querySelector('.cat-items').classList.toggle('open', catOpen[cat]);
+}
+
+function toggleCatVis(cat) {
+  const isVis = catVisible[cat] !== false;
+  catVisible[cat] = !isVis;
+  saveCatVis();
+
+  if (catVisible[cat] === false) {
+    map.removeLayer(catLayers[cat]);
+  } else {
+    catLayers[cat].addTo(map);
+  }
+
+  const section = document.querySelector(`.cat-section[data-cat="${cat}"]`);
+  if (section) section.querySelector('.cat-toggle').classList.toggle('visible', !isVis);
+}
+
+function flyToItem(idx) {
+  const m = markerLayers[idx];
+  if (!m) return;
+  const cat = markersData[idx].c;
+  // Ensure category is visible
+  if (catVisible[cat] === false) toggleCatVis(cat);
+  map.setView(m.getLatLng(), 5, {animate: true});
+  setTimeout(() => m.openPopup(), 300);
+}
+
+function updateSidebarItem(idx) {
+  const el = document.querySelector(`.cat-item[data-idx="${idx}"]`);
+  if (el) el.classList.toggle('checked', !!checked[idx]);
+
+  // Update category progress
+  const cat = markersData[idx].c;
+  const section = document.querySelector(`.cat-section[data-cat="${cat}"]`);
+  if (section) {
+    const items = markersData.filter((m, i) => m.c === cat);
+    const checkedCount = markersData.filter((m, i) => m.c === cat && checked[i]).length;
+    section.querySelector('.cat-progress').textContent = `${checkedCount}/${items.length}`;
+  }
+}
+
+function updateProgress() {
+  const total = markersData.length;
+  const done = Object.keys(checked).filter(k => checked[k]).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total}`;
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+function filterSidebar(q) {
+  document.querySelectorAll('.cat-section').forEach(section => {
+    const cat = section.dataset.cat;
+    let anyVisible = false;
+    section.querySelectorAll('.cat-item').forEach(el => {
+      const idx = +el.dataset.idx;
+      const name = markersData[idx].n.toLowerCase();
+      const show = !q || name.includes(q) || cat.toLowerCase().includes(q);
+      el.style.display = show ? '' : 'none';
+      if (show) anyVisible = true;
+    });
+    section.style.display = anyVisible ? '' : 'none';
+    if (q && anyVisible) {
+      section.querySelector('.cat-items').classList.add('open');
+      section.querySelector('.cat-expand').classList.add('open');
+    }
+  });
+}
+
+// ═══════════ FOOTER ACTIONS ═══════════
+function resetProgress() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  checked = {};
+  saveChecked();
+  Object.keys(markerLayers).forEach(idx => updateMarkerStyle(+idx));
+  buildSidebar();
+  updateProgress();
+}
+
+function exportProgress() {
+  const data = JSON.stringify({checked, catVisible, version: 1});
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'elden-ring-progress.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importProgress() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.checked) {
+          checked = data.checked;
+          saveChecked();
+          if (data.catVisible) { catVisible = data.catVisible; saveCatVis(); }
+          Object.keys(markerLayers).forEach(idx => updateMarkerStyle(+idx));
+          buildSidebar();
+          updateProgress();
+          // Re-apply category visibility
+          Object.keys(catLayers).forEach(cat => {
+            if (catVisible[cat] === false) map.removeLayer(catLayers[cat]);
+            else if (!map.hasLayer(catLayers[cat])) catLayers[cat].addTo(map);
+          });
+        }
+      } catch(err) { alert('Invalid file'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
 </script>
 </body>
 </html>
